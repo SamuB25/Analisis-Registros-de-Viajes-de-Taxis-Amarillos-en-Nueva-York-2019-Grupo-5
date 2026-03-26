@@ -48,12 +48,11 @@ columnas_estrictas = ['fare_amount', 'extra', 'mta_tax', 'tip_amount', 'tolls_am
 # columnas evaluadas tienen valores >= 0
 df_limpio = df_limpio[(df_limpio[columnas_estrictas] >= 0).all(axis=1)]
 
-# E. Eliminar decimales:
+# E. Eliminar decimales
 columnas_a_entero = ['vendorid', 'passenger_count', 'ratecodeid', 'pulocationid', 'dolocationid', 'payment_type']
 
 for col in columnas_a_entero:
-    # Asegúrate de que no queden nulos en estas columnas antes de convertir, o cámbialos por 0
-    df_limpio[col] = df_limpio[col].fillna(0).astype(int)
+    df_limpio[col] = df_limpio[col].astype('Int64')
 
 # 4. Cargar en el Modelo Normalizado
 # Conectar a la nueva base de datos
