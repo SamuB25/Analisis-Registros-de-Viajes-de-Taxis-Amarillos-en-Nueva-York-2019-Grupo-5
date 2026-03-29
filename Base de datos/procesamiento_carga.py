@@ -85,4 +85,41 @@ def procesar_y_cargar_por_lotes():
     conn_destino.close()
     print("\n✅ Carga completada con éxito.")
 
+def exportar_toda_la_bd_a_parquet():
+    print("\n📦 Generando Parquets (Modo Ahorro de Memoria - Sugerencia Vico)...")
+    conn = sql.connect(db_normalizada)
+    
+    query_tablas = "SELECT name FROM sqlite_master WHERE type='table';"
+    tablas_db = pd.read_sql_query(query_tablas, conn)
+    
+    for nombre_tabla in tablas_db['name']:
+        if nombre_tabla != 'sqlite_sequence': 
+            print(f"   -> Exportando tabla '{nombre_tabla}' a Parquet...")
+            
+            # Vico: Escritura por chunks para evitar NameError y MemoryError
+            if nombre_tabla in ['registro_viajes', 'finanzas_viaje']:
+                generador = pd.read_sql_query(f"SELECT * FROM {nombre_tabla}", conn, chunksize=200000)
+                primer_chunk = True
+                writer = None
+                
+                for chunk in generador:
+                    tabla_pa = pa.Table.from_pandas(chunk)
+                    if primer_chunk:
+                        writer = pq.ParquetWriter(f"{nombre_tabla}.parquet", tabla_pa.schema)
+                        primer_chunk = False
+                    writer.write_table(tabla_pa)
+                    
+                if writer:
+                    writer.close()
+            else:
+                df_tabla = pd.read_sql_query(f"SELECT * FROM {nombre_tabla}", conn)
+                df_tabla.to_parquet(f"{nombre_tabla}.parquet", engine='pyarrow', index=False)
+            
+    conn.close()
+    print("\n✅ Ecosistema Parquet generado exitosamente.")
+
+#BLOQUE DE EJECUCIÓN 
+if __name__ == "__main__":
+    procesar_y_cargar_por_lotes()
+    exportar_toda_la_bd_a_parquet()
     
