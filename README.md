@@ -13,7 +13,8 @@ Como estudiantes de la Escuela de Estadística y Ciencias Actuariales (EECA), en
 En cumplimiento con los estándares académicos de la Escuela de Estadística y Ciencias Actuariales (EECA), el presente proyecto se rige por un diseño de investigación descriptivo. Los resultados obtenidos, por ende, son de carácter descriptivo y no inferencial. 
 
 ### 🎯 Definición de Objetivos
-**Objetivo General: **Analizar el comportamiento de los pasajeros de los Yellow Taxis de Nueva York durante el trimestre octubre-diciembre de 2019, específicamente en los intervalos de mayor afluencia de usuarios, para comprender la influencia de la variable "hora" en el resto de los indicadores con la finalidad de construir perfiles comparativos entre pasajeros de "Hora Pico" y "Hora No Pico".
+**Objetivo General:**
+Analizar el comportamiento de los pasajeros de los Yellow Taxis de Nueva York durante el trimestre octubre-diciembre de 2019, específicamente en los intervalos de mayor afluencia de usuarios, para comprender la influencia de la variable "hora" en el resto de los indicadores con la finalidad de construir perfiles comparativos entre pasajeros de "Hora Pico" y "Hora No Pico".
 
 **Objetivos Específicos:**
 - Normalizar la base de datos relacional (SQLite) para garantizar la integridad referencial y la consistencia de la información.
@@ -28,11 +29,25 @@ En cumplimiento con los estándares académicos de la Escuela de Estadística y 
 - **Técnicas Empleadas:** Cálculo de estadísticos descriptivos (Medidas de Tendencia Central, Frecuencias Absolutas/Relativas y Medidas de Dispersión).
 
 ### ⚙️ Procesamiento de la Información
-- **Normalización: **Reestructuración de las bases de datos originales para eliminar redundancias y establecer un esquema relacional sólido.
-- **ETL & Data Lake: **Limpieza de registros inconsistentes y migración a formato Parquet, permitiendo un manejo fluido de la dimensión temporal y geográfica.
+
+- **Normalización:** Reestructuración de las bases de datos originales para eliminar redundancias y establecer un esquema relacional sólido.
+- **ETL & Data Lake:** Limpieza de registros inconsistentes y migración a formato Parquet, permitiendo un manejo fluido de la dimensión temporal y geográfica.
+  
 **Despliegue Analítico:**
+
 - **En Power BI:** Visualización del comportamiento general del universo (Métricas macro).
-- **A través de Streamlit: **Presentación de la investigación detallada y comparativa de perfiles (Investigación de nicho).
+- **A través de Streamlit:** Presentación de la investigación detallada y comparativa de perfiles (Investigación de nicho).
+
+## 👥 Créditos
+**Equipo Grupo 5 - EECA UCV**
+- Victoria Díaz (@vicoandrediaz): Lógica de inserción/exportación por chunks y arquitectura del Data Lake. Desarrollo del de la app de Streamlit. 
+- Samuel (@SamuB25): Definición de reglas de negocio, limpieza de datos y filtros financieros. Desarrollo de la app de Streamlit.
+- Yonelvis (@yonelvisgonzalez): Automatización de fuentes de datos y constantes del trimestre. Desarollo de la app de Streamlit.
+- Andrés Morales: Diseño y desarrollo del Power Bi. 
+
+**🎓 Agradecimientos**
+**Profesor Jesús Ochoa:** Por guiarnos hacia el uso de DuckDB y Parquet, elevando este proyecto a un estándar profesional de ingeniería de datos.
+**Profesor Oliver Triveño:** Por su constante apoyo y guía a lo largo del desarrollo de todo este proyecto. Su colaboración y asesoría han sido fundamentales para el diseño y despliegue del proyecto. 
 
 
 
