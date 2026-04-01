@@ -1,2 +1,3 @@
-# Analisis-Registros-de-Viajes-de-Taxis-Amarillos-en-Nueva-York-2019-Grupo-5
-"Analisis sobre el comportamiento de los pasajeros en las horas pico y el tipo de método de pago más usado en dichas horas"
+#🚕 Análisis Estadístico de los Yellow Taxis NYC (Octubre-Diciembre 2019) 
+![banner taxis](https://github.com/user-attachments/assets/f385580e-5717-4a27-ad55-b72d8674f8ae)
+Análisis descriptivo y optimización de arquitectura de datos para la comprensión del comportamiento de los pasajeros en horas pico en el sistema de transporte de Nueva York (Octubre-Diciembre 2019).	
