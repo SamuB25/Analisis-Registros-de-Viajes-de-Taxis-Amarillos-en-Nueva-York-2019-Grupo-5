@@ -46,8 +46,8 @@ Analizar el comportamiento de los pasajeros de los Yellow Taxis de Nueva York du
 - Andrés Morales: Diseño y desarrollo del Power Bi. 
 
 **🎓 Agradecimientos**
-**Profesor Jesús Ochoa:** Por guiarnos hacia el uso de DuckDB y Parquet, elevando este proyecto a un estándar profesional de ingeniería de datos.
-**Profesor Oliver Triveño:** Por su constante apoyo y guía a lo largo del desarrollo de todo este proyecto. Su colaboración y asesoría han sido fundamentales para el diseño y despliegue del proyecto. 
+- **Profesor Jesús Ochoa:** Por guiarnos hacia el uso de DuckDB y Parquet, elevando este proyecto a un estándar profesional de ingeniería de datos.
+- **Profesor Oliver Triveño:** Por su constante apoyo y guía a lo largo del desarrollo de todo este proyecto. Su colaboración y asesoría han sido fundamentales para el diseño y despliegue del proyecto. 
 
 
 
