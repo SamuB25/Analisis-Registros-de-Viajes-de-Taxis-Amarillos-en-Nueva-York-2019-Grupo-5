@@ -1,2 +1,4 @@
 .db #Ignora la base de datos
 .csv #Ignora los archivos csv 
+taxis_nuevayork2019_trimestre.db
+taxi_zone_lookup.csv
