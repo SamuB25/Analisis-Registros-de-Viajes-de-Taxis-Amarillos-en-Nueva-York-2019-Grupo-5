@@ -27,6 +27,12 @@ En cumplimiento con los estándares académicos de la Escuela de Estadística y 
 - **Unidad de Análisis:** Cada registro individual de viaje (trip_id) registrado en la ciudad de Nueva York (NYC) durante el cuarto trimestre (octubre, noviembre y diciembre) del año 2019.
 - **Técnicas Empleadas:** Cálculo de estadísticos descriptivos (Medidas de Tendencia Central, Frecuencias Absolutas/Relativas y Medidas de Dispersión).
 
+### ⚙️ Procesamiento de la Información
+- **Normalización: **Reestructuración de las bases de datos originales para eliminar redundancias y establecer un esquema relacional sólido.
+- **ETL & Data Lake: **Limpieza de registros inconsistentes y migración a formato Parquet, permitiendo un manejo fluido de la dimensión temporal y geográfica.
+**Despliegue Analítico:**
+- **En Power BI:** Visualización del comportamiento general del universo (Métricas macro).
+- **A través de Streamlit: **Presentación de la investigación detallada y comparativa de perfiles (Investigación de nicho).
 
 
 
