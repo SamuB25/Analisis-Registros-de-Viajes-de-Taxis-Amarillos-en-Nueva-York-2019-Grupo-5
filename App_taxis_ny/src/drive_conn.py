@@ -41,7 +41,6 @@ def ob_datos_ny(file_id,nombre_archivo):
 
 if __name__ == "__main__":
     # Creamos un diccionario que contenga la (file_id, nombre del archivo) 
-    print("__________ESTA VIVO___________")
     ar_parquets = {
         "1ASTSUYx9vd-3kkJwe9_v232iTseohzBR":"finanzas_viaje.parquet",
         "1RcW1H45PXIGl0OZjxMzfRJhBaBHo0cmg":"localizacion_viaje.parquet",
