@@ -1,5 +1,5 @@
 # Cuestionario SQL 
-
+import duckdb
 import sys
 import os
 
@@ -20,47 +20,44 @@ try:
 except Exception as e:
     print(f"❌ Error de ruta: {e}")
 def ejecutar_pregunta_1():
-
     manager = query_manager()
-    
     """
     Divide los viajes pagados con tarjeta de crédito en 4 cuartiles por distancia.
     Calcula distancia promedio, tarifa promedio y % de propina.
     """
 
-# 1. Cuartiles de Distancia y Comportamiento de Propinas
-# Enunciado: Divide todos los viajes pagados con tarjeta de crédito en 4 cuartiles basados 
-# en la distancia del viaje. Para cada cuartil, calcula la distancia promedio, el monto de tarifa
-#  promedio y el porcentaje promedio que representa la propina respecto al monto total.
-# Muestra el número de cuartil y las métricas calculadas.
+    # 1. Cuartiles de Distancia y Comportamiento de Propinas
+    # Enunciado: Divide todos los viajes pagados con tarjeta de crédito en 4 cuartiles basados 
+    # en la distancia del viaje. Para cada cuartil, calcula la distancia promedio, el monto de tarifa
+    #  promedio y el porcentaje promedio que representa la propina respecto al monto total.
+    # Muestra el número de cuartil y las métricas calculadas.
 
+    # El JOIN es vital: 'viaje' tiene la distancia, 'finanzas' tiene los montos.
 
- # El JOIN es vital: 'viaje' tiene la distancia, 'finanzas' tiene los montos.
-
-sql = """
-    WITH datos_unidos AS (
+    sql = """
+        WITH datos_unidos AS (
+            SELECT 
+                rv.trip_distance, 
+                fv.fare_amount, 
+                fv.tip_amount, 
+                fv.total_amount,
+                NTILE(4) OVER (ORDER BY rv.trip_distance) AS num_cuartil
+            FROM registro_viajes rv
+            -- Unimos directamente por el ID único del viaje
+            JOIN finanzas_viaje fv ON rv.trip_id = fv.trip_id
+            JOIN metodo_pago mp ON rv.payment_type_id = mp.payment_type_id
+            WHERE mp.descripcion ILIKE 'Credit card'
+              AND fv.total_amount > 0
+        )
         SELECT 
-            rv.trip_distance, 
-            fv.fare_amount, 
-            fv.tip_amount, 
-            fv.total_amount,
-            NTILE(4) OVER (ORDER BY rv.trip_distance) AS num_cuartil
-        FROM registro_viajes rv
-        -- Unimos directamente por el ID único del viaje
-        JOIN finanzas_viaje fv ON rv.trip_id = fv.trip_id
-        JOIN metodo_pago mp ON rv.payment_type_id = mp.payment_type_id
-        WHERE mp.descripcion ILIKE 'Credit card'
-          AND fv.total_amount > 0
-    )
-    SELECT 
-        num_cuartil AS "Cuartil",
-        ROUND(AVG(trip_distance), 2) AS "Distancia Promedio",
-        ROUND(AVG(fare_amount), 2) AS "Tarifa Promedio",
-        ROUND(AVG((tip_amount * 100.0) / total_amount), 2) AS "Propina %"
-    FROM datos_unidos
-    GROUP BY num_cuartil
-    ORDER BY num_cuartil;
-    """
+            num_cuartil AS "Cuartil",
+            ROUND(AVG(trip_distance), 2) AS "Distancia Promedio",
+            ROUND(AVG(fare_amount), 2) AS "Tarifa Promedio",
+            ROUND(AVG((tip_amount * 100.0) / total_amount), 2) AS "Propina %"
+        FROM datos_unidos
+        GROUP BY num_cuartil
+        ORDER BY num_cuartil;
+        """
     return manager.execute_query(sql)
 
 

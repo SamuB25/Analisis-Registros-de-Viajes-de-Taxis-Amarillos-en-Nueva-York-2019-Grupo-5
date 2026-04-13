@@ -3,3 +3,7 @@
 taxis_nuevayork2019_trimestre.db
 taxi_zone_lookup.csv
 data
+__pycache__
+__init__.cpython-314.pyc
+query_manager.cpython-314.pyc
+stats_logic.cpython-314.pyc
