@@ -62,3 +62,16 @@ Para garantizar una mejor contextualización a un público hispanohablante, se r
 * **PLATAFORMAS_TPEP**: Se tradujo `plataforma` para identificar proveedores (Creative Mobile / VeriFone).
 * **METODO_PAGO**: Se tradujo `descripcion` para identificar (Tarjeta, Efectivo, Sin Cargo, etc.).
 * **TARIFAS**: Se tradujo `descripcion` para tipos de tarifa (Estándar, JFK, Newark, Negociada).
+
+### 4. Optimización de Precisión: FINANZAS_VIAJE
+Para asegurar la integridad en grandes sumas de dinero (procesamiento de más de 20M de registros), se cambió el tipo de dato de **Número decimal** a **Número decimal fijo ($)** en los siguientes campos:
+
+* `importe_tarifa`, `cargos_adicionales`, `impuesto_mta`, `monto_propina`, `monto_peajes`, `recargo_mejora`, `monto_total`.
+
+**Beneficios Técnicos:**
+1. **Precisión:** Evita errores de redondeo en cálculos de sumas masivas.
+2. **Rendimiento:** Carga más eficiente en el motor de Power BI.
+3. **Visualización:** Formato de moneda automático y limpio en los objetos visuales.
+
+### 📊 Resultado del Proceso
+La base de datos resultante ofrece una estructura **saneada, optimizada y fácil de interpretar** para el análisis estadístico, eliminando barreras de idioma y asegurando precisión en los KPIs financieros.
