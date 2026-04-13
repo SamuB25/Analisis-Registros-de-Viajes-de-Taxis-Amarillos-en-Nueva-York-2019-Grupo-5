@@ -5,10 +5,73 @@
 # en la distancia del viaje. Para cada cuartil, calcula la distancia promedio, el monto de tarifa
 #  promedio y el porcentaje promedio que representa la propina respecto al monto total.
 # Muestra el número de cuartil y las métricas calculadas.
+import sys
+import os
 
+# 1. Obtenemos la ruta de 'pages'
+directorio_actual = os.path.dirname(os.path.abspath(__file__))
 
+# 2. Subimos UN nivel para llegar a la Raíz (donde están ambas carpetas)
+ruta_raiz = os.path.dirname(directorio_actual)
 
+# 3. Añadimos la Raíz al radar de Python
+if ruta_raiz not in sys.path:
+    sys.path.insert(0, ruta_raiz)
 
+# 4. AHORA EL IMPORT (Desde la raíz, entramos a App_taxis_ny -> src)
+try:
+    from App_taxis_ny.src.query_manager import query_manager
+    print("✅ Conexión establecida: Ahora pages y App_taxis ya se hablan.")
+except Exception as e:
+    print(f"❌ Error de ruta: {e}")
+def ejecutar_pregunta_1():
+    manager = query_manager()
+    """
+    Divide los viajes pagados con tarjeta de crédito en 4 cuartiles por distancia.
+    Calcula distancia promedio, tarifa promedio y % de propina.
+    """
+    
+    # El JOIN es vital: 'viaje' tiene la distancia, 'finanzas' tiene los montos.
+    sql = """
+    WITH datos_unidos AS (
+        SELECT 
+            v.trip_distance, 
+            f.fare_amount, 
+            f.tip_amount, 
+            f.total_amount,
+            NTILE(4) OVER (ORDER BY v.trip_distance) AS num_cuartil
+        FROM viaje v
+        JOIN finanzas f ON v.vendor_id = f.vendor_id 
+                       AND v.tpep_pickup_datetime = f.tpep_pickup_datetime
+        JOIN pagos p ON v.payment_type = p.payment_type
+        WHERE p.description ILIKE 'Credit card'
+          AND f.total_amount > 0
+    )
+    SELECT 
+        num_cuartil AS "Cuartil",
+        ROUND(AVG(trip_distance), 2) AS "Distancia Promedio",
+        ROUND(AVG(fare_amount), 2) AS "Tarifa Promedio",
+        ROUND(AVG((tip_amount * 100.0) / total_amount), 2) AS "Propina %"
+    FROM datos_unidos
+    GROUP BY num_cuartil
+    ORDER BY num_cuartil;
+    """
+    
+    return manager.execute_query(sql)
+
+# Bloque de ejecución principal
+if __name__ == "__main__":
+    print("\n--- EJECUTANDO CONSULTA 1: CUARTILES Y PROPINAS ---")
+    try:
+        df_resultado = ejecutar_pregunta_1()
+        if df_resultado.empty:
+            print("⚠️ La consulta no devolvió resultados. Revisa los filtros o los JOINs.")
+        else:
+            print(df_resultado)
+    except Exception as e:
+        print(f"❌ Error crítico al procesar los datos: {e}")
+
+        
 
 # 2. Análisis de Embotellamientos Críticos por Hora
 # Enunciado: Identifica a qué hora del día la ciudad sufre los peores embotellamientos. Define

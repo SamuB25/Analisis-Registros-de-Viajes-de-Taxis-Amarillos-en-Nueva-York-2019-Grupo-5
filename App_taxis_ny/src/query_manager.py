@@ -1,6 +1,7 @@
 import duckdb
 import os
 
+
 # Configuramos el lugar donde vamos a guardar y organizar nuestras tablas que se encuentran en "data".
 class query_manager:
     def __init__(self,db_path="taxis_ny.db"):
@@ -13,7 +14,7 @@ class query_manager:
         # Comenzando con la ruta de los archivos.
         dir_data = os.path.dirname(os.path.abspath(__file__)) # Mediante la ubicación de este archivo coordinamos la ruta
         # de forma en que dir_data sepa que debe trabajar en la carpeta "src", con el join le indicamos que avance en esa carpeta y entre a "data".
-        ruta_data = os.path.join(dir_data, "..", "..", "data")
+        ruta_data = os.path.join(dir_data, "..", "data")
 
         # Creamos un diccionario que identifique el nombre de la tabla y su archivo correspondiente.
 
@@ -42,4 +43,5 @@ class query_manager:
     def execute_query(self, sql):
         # Para que los querys se ejecuten desde sql y devuelva un dataframe
         return self.con.execute(sql).df()
+    test = print("query_manager listo para ejecutar consultas SQL.")
 
