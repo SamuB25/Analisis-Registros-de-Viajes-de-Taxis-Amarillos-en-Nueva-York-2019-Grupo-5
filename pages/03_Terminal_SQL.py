@@ -1,10 +1,5 @@
 # Cuestionario SQL 
 
-# 1. Cuartiles de Distancia y Comportamiento de Propinas
-# Enunciado: Divide todos los viajes pagados con tarjeta de crédito en 4 cuartiles basados 
-# en la distancia del viaje. Para cada cuartil, calcula la distancia promedio, el monto de tarifa
-#  promedio y el porcentaje promedio que representa la propina respecto al monto total.
-# Muestra el número de cuartil y las métricas calculadas.
 import sys
 import os
 
@@ -25,27 +20,37 @@ try:
 except Exception as e:
     print(f"❌ Error de ruta: {e}")
 def ejecutar_pregunta_1():
+
     manager = query_manager()
+    
     """
     Divide los viajes pagados con tarjeta de crédito en 4 cuartiles por distancia.
     Calcula distancia promedio, tarifa promedio y % de propina.
     """
-    
-    # El JOIN es vital: 'viaje' tiene la distancia, 'finanzas' tiene los montos.
-    sql = """
+
+# 1. Cuartiles de Distancia y Comportamiento de Propinas
+# Enunciado: Divide todos los viajes pagados con tarjeta de crédito en 4 cuartiles basados 
+# en la distancia del viaje. Para cada cuartil, calcula la distancia promedio, el monto de tarifa
+#  promedio y el porcentaje promedio que representa la propina respecto al monto total.
+# Muestra el número de cuartil y las métricas calculadas.
+
+
+ # El JOIN es vital: 'viaje' tiene la distancia, 'finanzas' tiene los montos.
+
+sql = """
     WITH datos_unidos AS (
         SELECT 
-            v.trip_distance, 
-            f.fare_amount, 
-            f.tip_amount, 
-            f.total_amount,
-            NTILE(4) OVER (ORDER BY v.trip_distance) AS num_cuartil
-        FROM viaje v
-        JOIN finanzas f ON v.vendor_id = f.vendor_id 
-                       AND v.tpep_pickup_datetime = f.tpep_pickup_datetime
-        JOIN pagos p ON v.payment_type = p.payment_type
-        WHERE p.description ILIKE 'Credit card'
-          AND f.total_amount > 0
+            rv.trip_distance, 
+            fv.fare_amount, 
+            fv.tip_amount, 
+            fv.total_amount,
+            NTILE(4) OVER (ORDER BY rv.trip_distance) AS num_cuartil
+        FROM registro_viajes rv
+        -- Unimos directamente por el ID único del viaje
+        JOIN finanzas_viaje fv ON rv.trip_id = fv.trip_id
+        JOIN metodo_pago mp ON rv.payment_type_id = mp.payment_type_id
+        WHERE mp.descripcion ILIKE 'Credit card'
+          AND fv.total_amount > 0
     )
     SELECT 
         num_cuartil AS "Cuartil",
@@ -56,8 +61,8 @@ def ejecutar_pregunta_1():
     GROUP BY num_cuartil
     ORDER BY num_cuartil;
     """
-    
     return manager.execute_query(sql)
+
 
 # Bloque de ejecución principal
 if __name__ == "__main__":
@@ -72,7 +77,6 @@ if __name__ == "__main__":
         print(f"❌ Error crítico al procesar los datos: {e}")
 
         
-
 # 2. Análisis de Embotellamientos Críticos por Hora
 # Enunciado: Identifica a qué hora del día la ciudad sufre los peores embotellamientos. Define
 # un embotellamiento como un viaje de más de 1 milla de distancia donde la velocidad promedio
@@ -97,7 +101,42 @@ if __name__ == "__main__":
 # basándote en la fecha de recogida. Calcula para ambos grupos el número de viajes,
 # el promedio de la tarifa base y el porcentaje que representa la propina sobre el monto total.
 
+query_4 = """
+WITH ViajesTarjeta AS (
+    SELECT 
+        r.trip_id,
+        r.pickup_date,
+        f.fare_amount,
+        f.tip_amount,
+        f.total_amount,
+        CAST(EXTRACT(ISODOW FROM TRY_CAST(r.pickup_date AS DATE)) AS INT) as dia_semana
+    FROM 
+        registro_viaje r
+    JOIN 
+        finanzas_viaje f ON r.trip_id = f.trip_id
+    WHERE 
+        r.payment_type_id = 1 
+        AND f.total_amount > 0
+)
+SELECT 
+    CASE 
+        WHEN dia_semana IN (6, 7) THEN 'Fin de Semana'
+        ELSE 'Día Laborable'
+    END AS tipo_dia,
+    COUNT(trip_id) AS numero_viajes,
+    ROUND(AVG(fare_amount), 2) AS promedio_tarifa_base,
+    ROUND((SUM(tip_amount) / SUM(total_amount)) * 100, 2) AS porcentaje_propina_total
+FROM 
+    ViajesTarjeta
+GROUP BY 
+    tipo_dia
+ORDER BY 
+    tipo_dia DESC
+"""
 
+# 2. Ejecutamos la consulta usando manager 
+if qm is not None:
+    df_4 = qm.execute_query(query_4)
 
 
 # 5. Impacto del Recargo por Congestión según la Longitud del Viaje
