@@ -1,0 +1,72 @@
+# 📑 Scripts Técnicos de Power Query (Lenguaje M)
+
+Este documento contiene el código fuente de las consultas aplicadas para la limpieza y transformación del dataset de Taxis de Nueva York (2019).
+
+---
+
+## 🚕 1. REGISTRO_VIAJES
+- **Carga:** Archivo Parquet desde almacenamiento local.
+- **Transformación:** Conversión de tipos de datos a Fecha y Hora para análisis temporal.
+- **Traducción:** Renombrado de campos técnicos al español.
+- **Filtro:** Selección exclusiva del cuarto trimestre (Octubre - Diciembre 2019).
+
+```m
+let
+    Origen = Parquet.Document(File.Contents("C:\Users\Alfonso\Documents\PROYECTO TAXIS\PARQUETS-TAXIS NUEVA YORK 2019\registro_viajes.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"pickup_date", type date}, {"pickup_time", type time}, {"dropoff_date", type date}, {"dropoff_time", type time}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"trip_id", "id_viaje"}, {"vendor_id", "id_proveedor"}, {"rate_code_id", "id_tipo_tarifa"}, {"payment_type_id", "id_metodo_pago"}, {"pickup_date", "fecha_recogida"}, {"pickup_time", "hora_recogida"}, {"dropoff_date", "fecha_finalizacion"}, {"dropoff_time", "hora_finalizacion"}, {"pu_location_id", "id_zona_origen"}, {"do_location_id", "id_zona_destino"}, {"passenger_count", "cantidad_pasajeros"}, {"trip_distance", "distancia_viaje"}}),
+    #"Filas filtradas" = Table.SelectRows(#"Columnas con nombre cambiado", each [fecha_recogida] >= #date(2019, 10, 1) and [fecha_recogida] <= #date(2019, 12, 31))
+in
+    #"Filas filtradas"
+
+
+
+## 💰 2. FINANZAS_VIAJE
+- **Optimización:** Conversión a "Número decimal fijo" (Currency) para mayor precisión.
+- **Normalización:** Aplicación de Number.Abs para convertir montos negativos en positivos (corrección de errores de registro).
+- **Diccionario:** Traducción de campos financieros y de pago.
+
+  let
+    Origen = Parquet.Document(File.Contents("C:\Users\Alfonso\Documents\PROYECTO TAXIS\PARQUETS-TAXIS NUEVA YORK 2019\finanzas_viaje.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+    #"Tipo cambiado" = Table.TransformColumnTypes(Origen,{{"fare_amount", Currency.Type}, {"extra", Currency.Type}, {"mta_tax", Currency.Type}, {"tip_amount", Currency.Type}, {"tolls_amount", Currency.Type}, {"improvement_surcharge", Currency.Type}, {"total_amount", Currency.Type}}),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(#"Tipo cambiado",{{"fare_amount", "importe_tarifa"}, {"extra", "cargos_adicionales"}, {"mta_tax", "impuesto_mta"}, {"tip_amount", "monto_propina"}, {"tolls_amount", "monto_peajes"}, {"improvement_surcharge", "recargo_mejora"}, {"total_amount", "monto_total"}, {"store_and_fwd_flag", "indicador_almacenamiento_envio"}, {"payment_type_id", "id_metodo_pago"}, {"trip_id", "id_viaje"}, {"vendor_id", "id_proveedor"}}),
+    #"Valor absoluto calculado" = Table.TransformColumns(#"Columnas con nombre cambiado",{{"importe_tarifa", Number.Abs, Currency.Type}, {"cargos_adicionales", Number.Abs, Currency.Type}, {"impuesto_mta", Number.Abs, Currency.Type}, {"monto_propina", Number.Abs, Currency.Type}, {"monto_peajes", Number.Abs, Currency.Type}, {"recargo_mejora", Number.Abs, Currency.Type}, {"monto_total", Number.Abs, Currency.Type}})
+  in
+    #"Valor absoluto calculado"
+
+
+
+📍 3. LOCALIZACION_VIAJE
+- **Estructura:** Renombrado de dimensiones geográficas (id_ubicacion, distrito, zona).
+
+let
+    Origen = Parquet.Document(File.Contents("C:\Users\Alfonso\Documents\PROYECTO TAXIS\PARQUETS-TAXIS NUEVA YORK 2019\localizacion_viaje.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"location_id", "id_ubicacion"}, {"borough", "distrito"}, {"zone", "zona"}, {"service_zone", "zona_servicio"}})
+in
+    #"Columnas con nombre cambiado"
+
+
+
+📂 4. TABLAS DE REFERENCIA (METADATA)
+Incluye las consultas de Tarifas, Plataformas y Métodos de Pago.
+
+- **Tarifas:**
+let
+    Origen = Parquet.Document(File.Contents("C:\Users\Alfonso\Documents\PROYECTO TAXIS\PARQUETS-TAXIS NUEVA YORK 2019\tarifas.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"rate_code_id", "id_tipo_tarifa"}})
+in
+    #"Columnas con nombre cambiado"
+
+- **Plataformas TPEP:**
+let
+    Origen = Parquet.Document(File.Contents("C:\Users\Alfonso\Documents\PROYECTO TAXIS\PARQUETS-TAXIS NUEVA YORK 2019\plataformas_tpep.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"vendor_id", "id_proveedor"}})
+in
+    #"Columnas con nombre cambiado"
+
+- **Método de Pago:**
+ let
+    Origen = Parquet.Document(File.Contents("C:\Users\Alfonso\Documents\PROYECTO TAXIS\PARQUETS-TAXIS NUEVA YORK 2019\metodo_pago.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+    #"Columnas con nombre cambiado" = Table.RenameColumns(Origen,{{"payment_type_id", "id_metodo_pago"}})
+in
+    #"Columnas con nombre cambiado"
