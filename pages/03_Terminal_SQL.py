@@ -101,43 +101,45 @@ if __name__ == "__main__":
 # basándote en la fecha de recogida. Calcula para ambos grupos el número de viajes,
 # el promedio de la tarifa base y el porcentaje que representa la propina sobre el monto total.
 
-query_4 = """
-WITH ViajesTarjeta AS (
+def ejecutar_query_4():
+    # Instanciamos el manager 
+    manager = query_manager()
+    query_4 = """
+    WITH ViajesTarjeta AS (
+        SELECT 
+            r.trip_id,
+            r.pickup_date,
+            f.fare_amount,
+            f.tip_amount,
+            f.total_amount,
+            CAST(EXTRACT(ISODOW FROM TRY_CAST(r.pickup_date AS DATE)) AS INT) as dia_semana
+        FROM 
+            registro_viaje r
+        JOIN 
+            finanzas_viaje f ON r.trip_id = f.trip_id
+        WHERE 
+            r.payment_type_id = 1 
+            AND f.total_amount > 0
+    )
     SELECT 
-        r.trip_id,
-        r.pickup_date,
-        f.fare_amount,
-        f.tip_amount,
-        f.total_amount,
-        CAST(EXTRACT(ISODOW FROM TRY_CAST(r.pickup_date AS DATE)) AS INT) as dia_semana
+        CASE 
+            WHEN dia_semana IN (6, 7) THEN 'Fin de Semana'
+            ELSE 'Día Laborable'
+        END AS tipo_dia,
+        COUNT(trip_id) AS numero_viajes,
+        ROUND(AVG(fare_amount), 2) AS promedio_tarifa_base,
+        ROUND((SUM(tip_amount) / SUM(total_amount)) * 100, 2) AS porcentaje_propina_total
     FROM 
-        registro_viaje r
-    JOIN 
-        finanzas_viaje f ON r.trip_id = f.trip_id
-    WHERE 
-        r.payment_type_id = 1 
-        AND f.total_amount > 0
-)
-SELECT 
-    CASE 
-        WHEN dia_semana IN (6, 7) THEN 'Fin de Semana'
-        ELSE 'Día Laborable'
-    END AS tipo_dia,
-    COUNT(trip_id) AS numero_viajes,
-    ROUND(AVG(fare_amount), 2) AS promedio_tarifa_base,
-    ROUND((SUM(tip_amount) / SUM(total_amount)) * 100, 2) AS porcentaje_propina_total
-FROM 
-    ViajesTarjeta
-GROUP BY 
-    tipo_dia
-ORDER BY 
-    tipo_dia DESC
-"""
+        ViajesTarjeta
+    GROUP BY 
+        tipo_dia
+    ORDER BY 
+        tipo_dia DESC
+    """
+    return manager.execute_query(query_4)
 
-# 2. Ejecutamos la consulta usando manager 
-if qm is not None:
-    df_4 = qm.execute_query(query_4)
-
+# Puedes probar si funciona imprimiendo el resultado así:
+print(ejecutar_query_4())
 
 # 5. Impacto del Recargo por Congestión según la Longitud del Viaje
 # Enunciado: Analiza cómo afecta el recargo por congestión a la estructura de costos del
@@ -146,4 +148,43 @@ if qm is not None:
 # total que es consumido exclusivamente por el recargo de congestión. Excluye viajes donde el
 # recargo sea cero o nulo.
 
+def ejecutar_pregunta_5():
+    # Instanciamos el manager 
+    manager = query_manager()
+    
+    sql = """
+    WITH ClasificacionViajes AS (
+        SELECT 
+            CASE 
+                WHEN r.trip_distance < 2 THEN 'Cortos'
+                WHEN r.trip_distance >= 2 AND r.trip_distance <= 8 THEN 'Medios'
+                WHEN r.trip_distance > 8 THEN 'Largos'
+            END AS categoria_viaje,
+            f.improvement_surcharge, 
+            f.total_amount
+        FROM registro_viajes r
+        JOIN finanzas_viaje f ON r.trip_id = f.trip_id
+        -- Filtramos para excluir recargos en cero o nulos, y totales en cero
+        WHERE f.improvement_surcharge IS NOT NULL 
+          AND f.improvement_surcharge > 0
+          AND f.total_amount > 0
+    )
+    SELECT 
+        categoria_viaje AS "Categoría de Viaje",
+        -- Calculamos el porcentaje: (Recargo / Total) * 100
+        ROUND(AVG((improvement_surcharge * 100.0) / total_amount), 2) AS "Porcentaje Promedio Recargo (%)"
+    FROM ClasificacionViajes
+    GROUP BY categoria_viaje
+    -- Ordenamos para que se vea más organizado
+    ORDER BY 
+        CASE categoria_viaje
+            WHEN 'Cortos' THEN 1
+            WHEN 'Medios' THEN 2
+            WHEN 'Largos' THEN 3
+        END;
+    """
+    
+    return manager.execute_query(sql)
 
+# Puedes probar si funciona imprimiendo el resultado así:
+print(ejecutar_pregunta_5())
