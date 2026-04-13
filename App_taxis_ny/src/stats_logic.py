@@ -2,8 +2,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from src.query_manager import query_manager
-from utils import build_sql_filter, BICKLE_PALETTE, get_accent_color
+from App_taxis_ny.src.query_manager import query_manager
+from App_taxis_ny.src.utils import build_sql_filter, BICKLE_PALETTE, get_accent_color
 
 # Instanciamos la conexión a DuckDB de forma global para este módulo
 @st.cache_resource
