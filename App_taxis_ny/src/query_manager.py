@@ -1,7 +1,6 @@
 import duckdb
 import os
 
-
 # Configuramos el lugar donde vamos a guardar y organizar nuestras tablas que se encuentran en "data".
 class query_manager:
     def __init__(self,db_path="taxis_ny.db"):
