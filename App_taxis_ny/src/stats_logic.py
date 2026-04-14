@@ -1,38 +1,100 @@
+import streamlit as st
 import pandas as pd
 
-# 1. Paleta de colores oficial
+# 1. PALETA DE COLORES OFICIAL (Bickle Palette) 
 BICKLE_PALETTE = {
     "taxi_yellow": "#F2BC1B",
     "asphalt_night": "#121212",
-    "secondary_bg": "#1F1F1F",
-    "steel_gray": "#8C8C8C",
     "vapor_white": "#F2F2F2",
     "neon_red": "#D90404",
-    "m65_green": "#4B5320"
+    "steel_gray": "#757575"
 }
 
 def get_accent_color(tipo_horario):
-    """Retorna Rojo si es Hora Pico, sino Amarillo."""
+    """El acento cambia a Neon Red si es Hora Pico."""
     return BICKLE_PALETTE["neon_red"] if tipo_horario == "Hora Pico" else BICKLE_PALETTE["taxi_yellow"]
 
 def format_kpi(value, is_money=False):
-    """Formatea números para los KPIs de la app."""
+    """Formatea números para la 'Zona de Despacho'."""
     if value is None: return "0"
     if is_money: return f"$ {value:,.2f}"
-    return f"{int(value):,}" if value > 100 else f"{value:.1f}"
+    if value >= 1_000_000: return f"{value/1_000_000:.1f}M"
+    return f"{int(value):,}" if value > 100 else f"{value:.2f}"
 
 def build_sql_filter(tipo_horario="Vista General", mes="Todos"):
-    """Genera la cláusula WHERE para las consultas SQL."""
+    """
+    Genera el Filtro Maestro basado en las columnas pickup_date y pickup_time.
+    Lógica de Hora Pico: Lun-Vie, 16:00 a 20:00.
+    """
     condiciones = ["1=1"]
+    
     if tipo_horario == "Hora Pico":
-        condiciones.append("CAST(EXTRACT(ISODOW FROM TRY_CAST(pickup_date AS DATE)) AS INT) BETWEEN 1 AND 5")
-        condiciones.append("pickup_time >= '16:00:00'")
-        condiciones.append("pickup_time <= '20:00:00'")
+        # Filtro: Lunes a Viernes (DOW 1-5) y horario de mayor afluencia 
+        condiciones.append("CAST(EXTRACT(DOW FROM CAST(pickup_date AS DATE)) AS INT) BETWEEN 1 AND 5")
+        condiciones.append("pickup_time BETWEEN '16:00:00' AND '20:00:00'")
     elif tipo_horario == "Hora No Pico":
-        condiciones.append("(CAST(EXTRACT(ISODOW FROM TRY_CAST(pickup_date AS DATE)) AS INT) IN (6, 7) OR pickup_time < '16:00:00' OR pickup_time > '20:00:00')")
+        condiciones.append("(CAST(EXTRACT(DOW FROM CAST(pickup_date AS DATE)) AS INT) IN (0, 6) OR pickup_time NOT BETWEEN '16:00:00' AND '20:00:00')")
 
     meses_map = {"Octubre": 10, "Noviembre": 11, "Diciembre": 12}
     if mes in meses_map:
-        condiciones.append(f"EXTRACT(MONTH FROM TRY_CAST(pickup_date AS DATE)) = {meses_map[mes]}")
+        condiciones.append(f"EXTRACT(MONTH FROM CAST(pickup_date AS DATE)) = {meses_map[mes]}")
     
     return " AND ".join(condiciones)
+
+# --- BLOQUE DE AGREGACIONES (Consultas DuckDB) ---
+
+@st.cache_data
+def get_average_metrics(_qm, tipo_horario, mes):
+    """Calcula promedios para las Cards superiores[cite: 10, 38]."""
+    filtro = build_sql_filter(tipo_horario, mes)
+    query = f"""
+        SELECT 
+            COUNT(v.trip_id) as total_viajes,
+            AVG(v.trip_distance) as avg_distance,
+            AVG(f.fare_amount) as avg_fare,
+            AVG(f.tip_amount) as avg_tip
+        FROM viaje v
+        JOIN finanzas f ON v.trip_id = f.trip_id
+        WHERE {filtro} AND f.total_amount > 0
+    """
+    return _qm.execute_query(query).iloc[0]
+
+@st.cache_data
+def get_passenger_distribution(_qm, tipo_horario, mes):
+    """Genera distribución omitiendo 0 pasajeros por consistencia operativa[cite: 5, 6, 44]."""
+    filtro = build_sql_filter(tipo_horario, mes)
+    query = f"""
+        SELECT passenger_count as Pasajeros, COUNT(*) as Frecuencia 
+        FROM viaje 
+        WHERE {filtro} AND passenger_count > 0 
+        GROUP BY 1 ORDER BY 1
+    """
+    return _qm.execute_query(query)
+
+@st.cache_data
+def get_usage_frequencies(_qm, tipo_horario, mes):
+    """Calcula frecuencia de pagos uniendo con la tabla de descripciones[cite: 4, 45]."""
+    filtro = build_sql_filter(tipo_horario, mes)
+    query = f"""
+        SELECT p.descripcion as Categoria, COUNT(*) as Frecuencia
+        FROM finanzas f
+        JOIN pagos p ON f.payment_type_id = p.payment_type_id
+        JOIN viaje v ON f.trip_id = v.trip_id
+        WHERE {filtro}
+        GROUP BY 1
+    """
+    return _qm.execute_query(query)
+
+@st.cache_data
+def get_location_ranking(_qm, tipo_horario, mes, top=True):
+    """Retorna el TOP 5 de destinos (Geografía de la Demanda)[cite: 7, 52, 53]."""
+    filtro = build_sql_filter(tipo_horario, mes)
+    orden = "DESC" if top else "ASC"
+    query = f"""
+        SELECT l.zone as Zona, COUNT(*) as Frecuencia
+        FROM viaje v
+        JOIN locaización l ON v.do_location_id = l.location_id
+        WHERE {filtro}
+        GROUP BY 1 ORDER BY 2 {orden} LIMIT 5
+    """
+    return _qm.execute_query(query)
