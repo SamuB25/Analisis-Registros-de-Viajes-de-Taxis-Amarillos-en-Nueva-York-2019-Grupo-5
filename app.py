@@ -65,6 +65,8 @@ with col_der:
     st.write("Frecuencia relativa de tipos de pago")
     st.bar_chart(df_pagos.set_index("Categoria"), color=accent)
 
+    st.caption("*Nota: La categoría 'Viaje anulado' no se muestra en el grafico porque los viajes con tarifa de $0 fueron removidos de la tabla principal (finanzas_viaje) durante la limpieza previa de datos.*")
+
 # --- PIE DE PÁGINA---
 st.markdown("---")
 st.subheader("📍 Geografía de la Demanda (Top 5 Destinos)")
