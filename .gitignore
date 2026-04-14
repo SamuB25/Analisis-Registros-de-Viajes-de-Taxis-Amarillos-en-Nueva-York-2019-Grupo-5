@@ -7,3 +7,9 @@ __pycache__
 __init__.cpython-314.pyc
 query_manager.cpython-314.pyc
 stats_logic.cpython-314.pyc
+*.db-wal
+*.wal
+App_taxis_ny/src/__pycache__/__init__.cpython-314.pyc
+App_taxis_ny/src/__pycache__/query_manager.cpython-314.pyc
+App_taxis_ny/src/__pycache__/stats_logic.cpython-314.pyc
+App_taxis_ny/__pycache__/__init__.cpython-314.pyc
