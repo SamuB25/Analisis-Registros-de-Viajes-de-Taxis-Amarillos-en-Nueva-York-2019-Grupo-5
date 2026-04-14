@@ -5,5 +5,4 @@ pandas
 numpy
 pyarrow
 plotly
-plotlyexpress
 sqlite3
