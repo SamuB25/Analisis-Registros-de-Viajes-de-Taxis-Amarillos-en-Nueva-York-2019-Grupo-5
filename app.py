@@ -1,4 +1,5 @@
 import streamlit as st
+import plotly.express as px
 from App_taxis_ny.src.query_manager import query_manager
 from App_taxis_ny.src.stats_logic import (
     BICKLE_PALETTE, get_accent_color, format_kpi,
