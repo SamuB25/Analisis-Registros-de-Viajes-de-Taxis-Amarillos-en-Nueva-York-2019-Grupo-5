@@ -32,7 +32,7 @@ def crear_tabla_localizacion_viaje():
     """)
     conn.commit()
     conn.close()
-    print("Tabla 'localizacion_viaje' creada exitosamente.")
+    print("Tabla 'localizacion_viaje' creada con exitosamente.")
 
 #Creamos la entidad de tarifa, en la que se registra el tipo de tarifa aplicado en cada viaje
 def crear_tabla_tarifas():
@@ -86,7 +86,7 @@ def crear_tabla_registro_trip():
     """)
     conn.commit()
     conn.close()
-    print("Tabla 'tabla_registro_trip' creada exitosamente.")
+    print("Tabla 'tabla_registro_trip' creada con exitosamente.")
 
 #Unificamos los hechos financieros en una sola entidad. 
 def crear_tabla_finanzas_viaje():
@@ -112,17 +112,17 @@ def crear_tabla_finanzas_viaje():
     """)
     conn.commit()
     conn.close()
-    print("Tabla 'finanzas_viaje' unificada y lista.")
+    print("Tabla 'finanzas_viaje' unificada lista.")
 
 #BLOQUE DE EJECUCIÓN
 
-# 1. Primero los catálogos (imprescindible para las FK)
+# 1. Primero catálogos (imprescindible para las FK)
 crear_tabla_tpep()
 crear_tabla_localizacion_viaje()
 crear_tabla_tarifas()
 crear_tabla_metodo_pago()
 
-# 2. Luego las tablas centrales de registro
+# 2. Luego tablas centrales de registro
 crear_tabla_registro_trip()
 crear_tabla_finanzas_viaje()
 

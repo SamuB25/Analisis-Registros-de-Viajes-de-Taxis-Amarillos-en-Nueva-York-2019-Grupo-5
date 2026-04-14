@@ -9,7 +9,7 @@ from App_taxis_ny.src.stats_logic import (
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="NYC Taxi Night Shift", layout="wide")
 
-# Fondo Asphalt Night
+# Fondo Asphalt Night (#121212) 
 st.markdown(
     f"<style>.stApp {{background-color: {BICKLE_PALETTE['asphalt_night']}; color: {BICKLE_PALETTE['vapor_white']};}}</style>", 
     unsafe_allow_html=True
@@ -34,7 +34,7 @@ with st.sidebar:
     accent = get_accent_color(tipo_horario) # Cambio a Neon Red automático 
     st.markdown(f"<p style='color:{accent}'>Modo Activo: {tipo_horario}</p>", unsafe_allow_html=True)
 
-# --- CABECERA (junto a la metricas de tendencia central)---
+# --- CABECERA (junto a la metricas de tendencia central---
 st.title(f"Dashboard: {tipo_horario}")
 kpis = get_average_metrics(qm, tipo_horario, mes_filtro)
 

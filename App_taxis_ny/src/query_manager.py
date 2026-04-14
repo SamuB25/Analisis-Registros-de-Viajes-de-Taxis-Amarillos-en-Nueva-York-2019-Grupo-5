@@ -4,7 +4,7 @@ import os
 # Configuramos el lugar donde vamos a guardar y organizar nuestras tablas que se encuentran en "data".
 class query_manager:
     def __init__(self,db_path="taxis_ny.db"):
-        # Creamos la conexión que se va a utilizar con los archivos. A parte de que se creara el archivo de "taxis.ny.db"
+        # Creamos la conexión que se va a utilizar con los archivos.A parte de que se creara el archivo de "taxis.ny.db"
         self.con = duckdb.connect(db_path)
         self._register_tables()
 
@@ -30,7 +30,7 @@ class query_manager:
 
         for name_table, archive in tables.items():
             ruta_archive = os.path.join(ruta_data, archive)
-        # Creamos un filtro que verifique la existencia del archivo en el dispositivo.
+        # Creamos un leve filtro que verifique la existencia del archivo en el dispositivo.
 
             if os.path.exists(ruta_archive):
                 self.con.execute(f"CREATE OR REPLACE VIEW {name_table} AS SELECT * FROM read_parquet('{ruta_archive}')")
@@ -40,7 +40,7 @@ class query_manager:
         print("Configuraciones de registro finalizadas.")
     
     def execute_query(self, sql):
-        # Para ejecutar querys desde sql y devuelva un dataframe
+        # Para que los querys se ejecuten desde sql y devuelva un dataframe
         return self.con.execute(sql).df()
     test = print("query_manager listo para ejecutar consultas SQL.")
 
