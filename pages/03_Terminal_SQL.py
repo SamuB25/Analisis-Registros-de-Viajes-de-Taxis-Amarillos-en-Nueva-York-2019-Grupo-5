@@ -32,7 +32,7 @@ def ejecutar_pregunta_1():
     #  promedio y el porcentaje promedio que representa la propina respecto al monto total.
     # Muestra el número de cuartil y las métricas calculadas.
 
-    # El JOIN es vital: 'viaje' tiene la distancia, 'finanzas' tiene los montos.
+    # JOIN: 'viaje' tiene la distancia, 'finanzas' tiene los montos.
 
     sql = """
         WITH datos_unidos AS (
@@ -135,7 +135,7 @@ def ejecutar_query_4():
     """
     return manager.execute_query(query_4)
 
-# Puedes probar si funciona imprimiendo el resultado así:
+# Prueba del query 4:
 print(ejecutar_query_4())
 
 # 5. Impacto del Recargo por Congestión según la Longitud del Viaje
@@ -183,5 +183,5 @@ def ejecutar_pregunta_5():
     
     return manager.execute_query(sql)
 
-# Puedes probar si funciona imprimiendo el resultado así:
+# Prueba del query 5:
 print(ejecutar_pregunta_5())

@@ -4,9 +4,9 @@ import sys #para interactuar directamente con python y cerrar directamente proce
 
 def ob_datos_ny(file_id,nombre_archivo):
     #   Le otorgamos una especificación para buscar el archivo principalmente 
-    # por la id que maneje dentro de drive la cual ira acompañada del nombre del arcchivo.
+    # por la id que maneje dentro de drive la cual ira acompañada del nombre del archivo.
 
-    #   Dado que ya creamos la carpeta llamada "data" la cual se encuentra dentro esta misma carpeta 
+    #   Dado que ya creamos la carpeta llamada "data" la cual se encuentra dentro la misma carpeta 
     # de la App nuestra prioridad es denominarla como nuestro directorio local a donde poder dirigir 
     # nuestros archivos parquet.
 
@@ -15,23 +15,23 @@ def ob_datos_ny(file_id,nombre_archivo):
         os.makedirs(directorio)
         print(f"carpeta {directorio} creada con éxito")
 
-        # Nos aseguramos de que en dado caso no exista la carpeta de data se cree para seguir sin problemas.
+        # Nos aseguramos de que en dado caso no exista la carpeta de data se cree para evitar problemas
 
     ruta_completa = os.path.join(directorio, nombre_archivo)
 
     if os.path.exists(ruta_completa):
         print("el archivo ya se encuentra en la carpeta ´data´ local")
         return
-            #  En este caso nos interesa ahorrar tiempo, si el archivo parquet ya se obtuvo por otros metodos nos
-            # interesa que nuestra función pueda identificar ese archivo "x" y pasar directamente a aquellos que falten.
+            #  En este caso nos interesa ahorrar tiempo, si el archivo parquet ya se obtuvo por otros metodos, nos
+            # interesa que nuestra función pueda identificar ese archivo "x" y pasar directamente a aquellos que falten
 
     url_final = f"https://drive.google.com/uc?id={file_id}"
             # Definimos la url_final con un f-string para así tener un codigo algo mas dinamico dado que 
-            # son 6 archivos parquet dentro del drive y se debe ir adaptando a cada uno.
+            # son 6 archivos parquet dentro del drive y se debe adaptar a cada uno
 
     try:
         gdown.download(url_final,ruta_completa, quiet=False)
-                # quiet=false da permiso a gdown para activar la interfaz visual de descarga y así vizualizar la misma.
+                # quiet=false da permiso a gdown para activar la interfaz visual de descarga y poder vizualizarla
 
         if os.path.exists(ruta_completa):
             print(f"Se ha descargado exitosamente el archivo {nombre_archivo}")
