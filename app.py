@@ -29,7 +29,7 @@ def get_average_metrics(tipo_horario, mes):
     query = f"""
         SELECT COUNT(r.trip_id) as total_viajes, AVG(r.trip_distance) as avg_distance,
                AVG(f.fare_amount) as avg_fare, AVG(f.tip_amount) as avg_tip
-        FROM registro_viajes r JOIN finanzas_viaje f ON r.trip_id = f.trip_id
+        FROM registro_viaje r JOIN finanzas_viaje f ON r.trip_id = f.trip_id
         WHERE {filtro} AND f.total_amount > 0
     """
     return qm.execute_query(query).iloc[0]
@@ -38,7 +38,7 @@ def get_average_metrics(tipo_horario, mes):
 def get_passenger_distribution(tipo_horario, mes):
     qm = get_qm()
     filtro = build_sql_filter(tipo_horario, mes)
-    query = f"SELECT passenger_count as Pasajeros, COUNT(*) as Frecuencia FROM registro_viajes WHERE {filtro} AND passenger_count > 0 GROUP BY 1"
+    query = f"SELECT passenger_count as Pasajeros, COUNT(*) as Frecuencia FROM registro_viaje WHERE {filtro} AND passenger_count > 0 GROUP BY 1"
     return qm.execute_query(query)
 
 @st.cache_data
