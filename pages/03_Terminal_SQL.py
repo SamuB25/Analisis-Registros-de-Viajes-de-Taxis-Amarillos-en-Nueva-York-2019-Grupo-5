@@ -43,7 +43,7 @@ def ejecutar_query_1():
     return manager.execute_query(sql)
 
 # Anexar una interfaz para que se vizualice el resultado consultado de manera correcta
-st.title("Query nro 1. Cuartiles de Distancia y Comportamiento de Propinas")
+st.title("Query nro 1. Cuartiles por Distancia y Comportamiento de Propinas")
 st.subheader("Resultados:")     
 try:
     df_resultado = ejecutar_query_1()
@@ -101,7 +101,6 @@ def ejecutar_query_2():
 """
     return manager.execute_query(sql)
 
-# Al igual que el primero vamos a hacerle una mejor visualización.
 
 st.title("Query nro 2. Análisis de embotellamientos críticos por hora")
 st.subheader("Resultados:")
@@ -186,18 +185,18 @@ def ejecutar_query_4():
     sql = """
     WITH ViajesTarjeta AS (
         SELECT 
-            r.trip_id,
-            r.pickup_date,
+            v.trip_id,
+            v.pickup_date,
             f.fare_amount,
             f.tip_amount,
             f.total_amount,
-            CAST(EXTRACT(ISODOW FROM TRY_CAST(r.pickup_date AS DATE)) AS INT) as dia_semana
+            CAST(EXTRACT(ISODOW FROM TRY_CAST(v.pickup_date AS DATE)) AS INT) as dia_semana
         FROM 
-            viaje r
+            viaje v
         JOIN 
-            finanzas f ON r.trip_id = f.trip_id
+            finanzas f ON v.trip_id = f.trip_id
         WHERE 
-            r.payment_type_id = 1 
+            v.payment_type_id = 1 
             AND f.total_amount > 0
     )
     SELECT 
@@ -217,6 +216,8 @@ def ejecutar_query_4():
     """
     return manager.execute_query(sql)
 
+st.title("Query nro 4. Comportamiento de Propinas: Fines de Semana vs. Días Laborables")
+st.subheader("Resultados:")     
 
 # 5. Impacto del Recargo por Congestión según la Longitud del Viaje
 # Enunciado: Analiza cómo afecta el recargo por congestión a la estructura de costos del
@@ -233,9 +234,9 @@ def ejecutar_pregunta_5():
     WITH ClasificacionViajes AS (
         SELECT 
             CASE 
-                WHEN r.trip_distance < 2 THEN 'Cortos'
-                WHEN r.trip_distance >= 2 AND r.trip_distance <= 8 THEN 'Medios'
-                WHEN r.trip_distance > 8 THEN 'Largos'
+                WHEN v.trip_distance < 2 THEN 'Cortos'
+                WHEN v.trip_distance >= 2 AND v.trip_distance <= 8 THEN 'Medios'
+                WHEN v.trip_distance > 8 THEN 'Largos'
             END AS categoria_viaje,
             f.improvement_surcharge, 
             f.total_amount
@@ -262,3 +263,6 @@ def ejecutar_pregunta_5():
     """
     
     return manager.execute_query(sql)
+
+st.title("Query nro 5. Impacto del Recargo por Congestión según la Longitud del Viaje")
+st.subheader("Resultados:")
