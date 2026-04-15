@@ -226,7 +226,7 @@ st.subheader("Resultados:")
 # total que es consumido exclusivamente por el recargo de congestión. Excluye viajes donde el
 # recargo sea cero o nulo.
 
-def ejecutar_pregunta_5():
+def ejecutar_query_5():
     
     manager = query_manager()
     
