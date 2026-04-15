@@ -16,11 +16,11 @@ class QueryManager:
 
         # Diccionario de tablas (Mapeo de archivos Parquet)
         tables = {
-            "finanzas": "finanzas_viaje.parquet",
+            "finanzas": "finanzas_viaje.parquet", #nos aseguramos cada nombre en el diccionario coincida 
             "localizacion": "localizacion_viaje.parquet",
             "pagos": "metodo_pago.parquet",
             "plataformas": "plataformas_tpep.parquet",
-            "viaje": "registro_viaje.parquet",
+            "viaje": "registro_viajes.parquet",
             "tarifas": "tarifas.parquet"
         }
 

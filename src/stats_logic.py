@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px #Se incorpora plotly.express para garantizar gráficos dinámicos 
 
 # 1. PALETA DE COLORES OFICIAL (Bickle Palette) inspirada en Taxi Driver 
 BICKLE_PALETTE = {
@@ -12,26 +11,28 @@ BICKLE_PALETTE = {
 }
 
 def get_accent_color(tipo_horario):
-    """El acento cambia a Neon Red solo en Hora Pico[cite: 15, 56]."""
+    """El acento cambia a Neon Red si es Hora Pico."""
     return BICKLE_PALETTE["neon_red"] if tipo_horario == "Hora Pico" else BICKLE_PALETTE["taxi_yellow"]
 
 def format_kpi(value, is_money=False):
-    """Formatea números para la 'Zona de Despacho'[cite: 57]."""
-    if value is None or pd.isna(value): return "0"
+    """Formatea números para la 'Zona de Despacho'."""
+    if value is None: return "0"
     if is_money: return f"$ {value:,.2f}"
     if value >= 1_000_000: return f"{value/1_000_000:.1f}M"
     return f"{int(value):,}" if value > 100 else f"{value:.2f}"
 
 def build_sql_filter(tipo_horario="Vista General", mes="Todos"):
-    """Genera el Filtro Maestro basado en el rigor de la UCV[cite: 25, 31, 69]."""
+    """
+    Genera el Filtro Maestro basado en las columnas pickup_date y pickup_time.
+    Lógica de Hora Pico: Lun-Vie, 16:00 a 20:00.
+    """
     condiciones = ["1=1"]
     
     if tipo_horario == "Hora Pico":
-        # Lun-Vie entre 16:00 y 20:00 [cite: 31]
+        # Filtro: Lunes a Viernes (DOW 1-5) y horario de mayor afluencia 
         condiciones.append("CAST(EXTRACT(DOW FROM CAST(pickup_date AS DATE)) AS INT) BETWEEN 1 AND 5")
         condiciones.append("pickup_time BETWEEN '16:00:00' AND '20:00:00'")
     elif tipo_horario == "Hora No Pico":
-        # Fines de semana O fuera del horario pico
         condiciones.append("(CAST(EXTRACT(DOW FROM CAST(pickup_date AS DATE)) AS INT) IN (0, 6) OR pickup_time NOT BETWEEN '16:00:00' AND '20:00:00')")
 
     meses_map = {"Octubre": 10, "Noviembre": 11, "Diciembre": 12}
@@ -40,11 +41,11 @@ def build_sql_filter(tipo_horario="Vista General", mes="Todos"):
     
     return " AND ".join(condiciones)
 
-# BLOQUE DE AGREGACIONES (Consultas DuckDB con Caching para optimizar la rapidez de la lectura de la app)
+# --- BLOQUE DE AGREGACIONES (Consultas DuckDB) ---
 
 @st.cache_data
 def get_average_metrics(_qm, tipo_horario, mes):
-    """Calcula KPIs robustos"""
+    """Calcula promedios para las Cards superiores[cite: 10, 38]."""
     filtro = build_sql_filter(tipo_horario, mes)
     query = f"""
         SELECT 
@@ -56,24 +57,41 @@ def get_average_metrics(_qm, tipo_horario, mes):
         JOIN finanzas f ON v.trip_id = f.trip_id
         WHERE {filtro} AND f.total_amount > 0
     """
-    res = _qm.execute_query(query)
-    return res.iloc[0] if not res.empty else {"total_viajes":0, "avg_distance":0, "avg_fare":0, "avg_tip":0}
+    return _qm.execute_query(query).iloc[0]
 
 @st.cache_data
-def get_dynamic_insight(kpis, tipo_horario):
-    """Genera reseñas interactivas basadas en los datos"""
-    if kpis['total_viajes'] == 0: return "No hay datos para este filtro."
-    
-    if tipo_horario == "Hora Pico":
-        return f"🚨 **Alerta de Tráfico:** En horas pico, la propina promedio es de {format_kpi(kpis['avg_tip'], True)}."
-    else:
-        return f"🌙 **Perfil Nocturno/Weekend:** Los viajes suelen ser más largos ({format_kpi(kpis['avg_distance'])} mi), lo que indica desplazamientos hacia zonas residenciales."
+def get_passenger_distribution(_qm, tipo_horario, mes):
+    """Genera distribución omitiendo 0 pasajeros por consistencia operativa[cite: 5, 6, 44]."""
+    filtro = build_sql_filter(tipo_horario, mes)
+    query = f"""
+        SELECT passenger_count as Pasajeros, COUNT(*) as Frecuencia 
+        FROM viaje 
+        WHERE {filtro} AND passenger_count > 0 
+        GROUP BY 1 ORDER BY 1
+    """
+    return _qm.execute_query(query)
+
+@st.cache_data
+def get_usage_frequencies(_qm, tipo_horario, mes):
+    """Calcula frecuencia de pagos uniendo con la tabla de descripciones[cite: 4, 45]."""
+    filtro = build_sql_filter(tipo_horario, mes)
+    query = f"""
+        SELECT p.descripcion as Categoria, COUNT(*) as Frecuencia
+        FROM finanzas f
+        JOIN pagos p ON f.payment_type_id = p.payment_type_id
+        JOIN viaje v ON f.trip_id = v.trip_id
+        WHERE {filtro}
+        GROUP BY 1
+    """
+    return _qm.execute_query(query)
 
 @st.cache_data
 def get_location_ranking(_qm, tipo_horario, mes, top=True):
-    """Top 5 Destinos más frecuentados"""
+    """Retorna el TOP 5 de destinos (Geografía de la Demanda)."""
     filtro = build_sql_filter(tipo_horario, mes)
     orden = "DESC" if top else "ASC"
+    
+    # CORRECCIÓN: Quitamos la tilde a 'localizacion'
     query = f"""
         SELECT l.zone as Zona, COUNT(*) as Frecuencia
         FROM viaje v
@@ -82,3 +100,13 @@ def get_location_ranking(_qm, tipo_horario, mes, top=True):
         GROUP BY 1 ORDER BY 2 {orden} LIMIT 5
     """
     return _qm.execute_query(query)
+
+@st.cache_data
+def get_dynamic_insight(kpis, tipo_horario):
+    """Genera la reseña automática para el chat_message de app.py."""
+    if kpis['total_viajes'] == 0: return "No hay datos disponibles para este periodo."
+    
+    if tipo_horario == "Hora Pico":
+        return f"🚨 **Perfil de Alta Demanda:** En este horario, la propina promedio es de {format_kpi(kpis['avg_tip'], True)}. El volumen de viajes se concentra en distancias cortas e intensas."
+    else:
+        return f"🌙 **Perfil Valle:** Se observa una distancia promedio de {format_kpi(kpis['avg_distance'])} mi. Los viajes son más largos, posiblemente hacia zonas residenciales."
