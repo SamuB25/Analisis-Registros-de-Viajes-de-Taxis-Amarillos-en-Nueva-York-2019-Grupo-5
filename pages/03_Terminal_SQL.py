@@ -64,10 +64,11 @@ except Exception as e:
 # cayeron en embotellamiento y el porcentaje que estos representan. Ordena de peor a mejor porcentaje.
 
 def ejecutar_query_2():
+    manager = query_manager()
     """
     Identifica a qué hora del día la ciudad sufre los peores embotellamientos.
     """
-    manager = query_manager()
+    
     # La función "cast" en este caso nos permite convertir la hora a una variable INT lo que me parece acorde dado que luego tendre que ver las mph.
 
     # Se había planteado utilizar la función epoch pues se investigo que convertiría las horas a segundos pero gracias a problemas con el mismo se tuvo que buscar otra opción (DATEDIFF).
@@ -126,7 +127,56 @@ except Exception as e:
 # del año 2019, muestra el mes, el total de viajes de ese mes, el total de viajes del mes
 # inmediatamente anterior y el porcentaje de variación.
 
+def ejecutar_query_3():
+    manager = query_manager()
+    """
+    Evalúa la estacionalidad del servicio calculando la tasa de crecimiento mensual. Para cada mes del ultimo trimestre del año 2019, muestra el mes, el total de viajes de ese mes, el total de viajes del mes inmediatamente anterior y el porcentaje de variación.
+    """
+    sql = """ 
+    WITH Mensual AS (
+    SELECT
+        EXTRACT(MONTH FROM TRY_CAST(pickup_date AS DATE)) AS mes,
+        COUNT(*) AS total_viajes
+    FROM viaje
+    WHERE pickup_date IS NOT NULL
+    GROUP BY mes
+    ),
+    Crecimiento AS (
+        SELECT
+            mes,
+            total_viajes,
+            LAG(total_viajes) OVER (ORDER BY mes) AS viajes_mes_anterior
+        FROM Mensual
+    )
+    SELECT
+        CAST(mes AS INT) AS "Mes",
+        total_viajes AS "Total Viajes",
+        viajes_mes_anterior AS "Viajes Mes Anterior",
+        COALESCE(
+            ROUND(((total_viajes - viajes_mes_anterior) * 100.0) / NULLIF(viajes_mes_anterior, 0), 2), 0.0) AS "Variacion %"
+    FROM Crecimiento
+    WHERE mes BETWEEN 10 AND 12
+    ORDER BY mes DESC;
+"""
+    return manager.execute_query(sql)
 
+st.title("Query nro 3. Análisis de crecimiento intermensual de la demanda")
+st.subheader("Resultados:")
+
+df_resultado_3 = ejecutar_query_3()
+if df_resultado_3 is not None and not df_resultado_3.empty:  
+
+    for _, row in df_resultado_3.iterrows():
+        mes_num = int(row["Mes"])
+        total = int(row["Total Viajes"])
+        variacion = row["Variacion %"]
+        
+        if mes_num == 10:
+            st.metric(label=f"Mes {mes_num}", value=f"{total:,} viajes")
+        else:
+            st.metric(label=f"Mes {mes_num}", value=f"{total:,} viajes", delta=f"{variacion}%")
+else:
+    st.warning("No se encontraron datos para mostrar.")
 
 # 4. Comportamiento de Propinas: Fines de Semana vs. Días Laborables
 # Enunciado: ¿La gente da mejores propinas los fines de semana? Clasifica los viajes pagados
@@ -135,7 +185,6 @@ except Exception as e:
 # el promedio de la tarifa base y el porcentaje que representa la propina sobre el monto total.
 
 def ejecutar_query_4():
-    # Instanciamos el manager 
     manager = query_manager()
     query_4 = """
     WITH ViajesTarjeta AS (
@@ -171,8 +220,7 @@ def ejecutar_query_4():
     """
     return manager.execute_query(query_4)
 
-# Puedes probar si funciona imprimiendo el resultado así:
-print(ejecutar_query_4())
+
 
 # 5. Impacto del Recargo por Congestión según la Longitud del Viaje
 # Enunciado: Analiza cómo afecta el recargo por congestión a la estructura de costos del
