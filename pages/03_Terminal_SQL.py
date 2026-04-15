@@ -3,14 +3,14 @@ import streamlit as st
 import pandas as pd
 from App_taxis_ny.src.query_manager import query_manager
 
-def ejecutar_pregunta_1():
+def ejecutar_query_1():
     manager = query_manager()
     """
     Divide los viajes pagados con tarjeta de crédito en 4 cuartiles por distancia.
     Calcula distancia promedio, tarifa promedio y % de propina.
     """
 
-    # 1. Cuartiles de Distancia y Comportamiento de Propinas
+    # 1. Cuartiles por Distancia y Comportamiento de Propinas
     # Enunciado: Divide todos los viajes pagados con tarjeta de crédito en 4 cuartiles basados 
     # en la distancia del viaje. Para cada cuartil, calcula la distancia promedio, el monto de tarifa
     #  promedio y el porcentaje promedio que representa la propina respecto al monto total.
@@ -42,15 +42,15 @@ def ejecutar_pregunta_1():
         """
     return manager.execute_query(sql)
 
-#como ya no estamos trabajando con direcciones eliminamos eso pues el import de App_.... debería funcionar
+# como ya no estamos trabajando con direcciones eliminamos eso pues el import de App_.... debería funcionar
 # Anexas una interfaz para que se vizualice el resultado consultado de manera correcta a petición del grupo
 st.title("Query nro 1. Cuartiles de Distancia y Comportamiento de Propinas")
 st.subheader("Resultados:")     
 try:
-    df_resultado = ejecutar_pregunta_1()
+    df_resultado = ejecutar_query_1()
     if df_resultado.empty:
         st.warning("No se encontraron datos para la consulta.")
-    else:
+    else: # se elimino esa parte por que solo se quería confirmar que mostrase bien el resultado.
         st.dataframe(df_resultado)
         st.caption("En el primer cuartil (el cual equivale a los viajes con un distancia más corta) es el que mayor porcentaje de propinas con un 15.41% a diferencia de cuarto cuartil que contiene las distancias promedio mas altas pero el porcentaje de propinas entre los cuatro cuartiles con unn 14.82%") 
 except Exception as e:
@@ -63,8 +63,62 @@ except Exception as e:
 # Muestra la hora, el número total de viajes realizados a esa hora, la cantidad de viajes que
 # cayeron en embotellamiento y el porcentaje que estos representan. Ordena de peor a mejor porcentaje.
 
+def ejecutar_query_2():
+    """
+    Identifica a qué hora del día la ciudad sufre los peores embotellamientos.
+    """
+    manager = query_manager()
+    # La función "cast" en este caso nos permite convertir la hora a una variable INT lo que me parece acorde dado que luego tendre que ver las mph.
 
+    # Se había planteado utilizar la función epoch pues se investigo que convertiría las horas a segundos pero gracias a problemas con el mismo se tuvo que buscar otra opción (DATEDIFF).
 
+    # Se definio "embotellamiento" como momento donde velocidad sea menos a 5mph (distancia/ tiempo menor a 5)
+
+    sql = """
+    WITH Embotellamientos AS (
+        SELECT 
+            CAST(EXTRACT(HOUR FROM TRY_CAST(pickup_time AS TIME)) AS INT) AS hora,
+            trip_distance,
+            (DATEDIFF('second', TRY_CAST(pickup_time AS TIME), TRY_CAST(dropoff_time AS TIME)) / 3600.0) AS duracion_horas
+        FROM viaje
+        WHERE pickup_time IS NOT NULL 
+          AND dropoff_time IS NOT NULL 
+          AND trip_distance > 1.0
+    ),
+    Metricas AS (
+        SELECT
+            hora,
+            COUNT(*) AS total_viajes,
+            SUM(CASE WHEN (trip_distance / NULLIF(duracion_horas, 0)) < 5.0 THEN 1 ELSE 0 END) AS viajes_embotellados
+            FROM Embotellamientos
+            GROUP BY hora
+    ) 
+    SELECT
+        hora AS "Hora",
+        total_viajes AS "Total Viajes",
+        viajes_embotellados AS "Viajes en embotellamiento",
+        ROUND((viajes_embotellados * 100.0) / total_viajes, 2) AS "porcentaje %"
+    FROM Metricas
+    ORDER BY "Porcentaje %" DESC;
+"""
+    return manager.execute_query(sql)
+
+# Al igual que el primero vamos a hacerle una mejor visualización.
+
+st.title("Query nro 2. Análisis de embotellamientos críticos por hora")
+st.subheader("Resultados:")
+try:
+    df_resultado_2 = ejecutar_query_2()
+    if df_resultado.empty:
+        st.warning("No se encontraron datos para la consulta.")
+    else:
+        st.dataframe(df_resultado_2)
+        hora_critica = df_resultado_2.iloc[0]["Hora"]
+        peor_pcr = df_resultado_2.iloc[0]["porcentaje %"]
+        # pcr porcentaje critico
+        st.info(f"La hora más critica es a las {int(hora_critica)}:00 con un {peor_pcr}% de embotellamientos.")
+except Exception as e:
+    st.error(f"Ocurrió un error al ejecutar la consulta: {e}")
 
 # 3. Crecimiento Intermensual (MoM) de la Demanda
 # Enunciado: Evalúa la estacionalidad del servicio calculando la tasa de crecimiento mensual
@@ -93,9 +147,9 @@ def ejecutar_query_4():
             f.total_amount,
             CAST(EXTRACT(ISODOW FROM TRY_CAST(r.pickup_date AS DATE)) AS INT) as dia_semana
         FROM 
-            registro_viaje r
+            viaje v
         JOIN 
-            finanzas_viaje f ON r.trip_id = f.trip_id
+            finanzas f ON r.trip_id = f.trip_id
         WHERE 
             r.payment_type_id = 1 
             AND f.total_amount > 0
@@ -141,8 +195,8 @@ def ejecutar_pregunta_5():
             END AS categoria_viaje,
             f.improvement_surcharge, 
             f.total_amount
-        FROM registro_viajes r
-        JOIN finanzas_viaje f ON r.trip_id = f.trip_id
+        FROM viaje v
+        JOIN finanzas f ON v.trip_id = f.trip_id
         -- Filtramos para excluir recargos en cero o nulos, y totales en cero
         WHERE f.improvement_surcharge IS NOT NULL 
           AND f.improvement_surcharge > 0
