@@ -2,7 +2,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from App_taxis_ny.src.query_manager import query_manager
+from src.query_manager import get_query_manager
 
     # 1. Cuartiles por Distancia y Comportamiento de Propinas
     # Enunciado: Divide todos los viajes pagados con tarjeta de crédito en 4 cuartiles basados 
@@ -11,7 +11,7 @@ from App_taxis_ny.src.query_manager import query_manager
     # Muestra el número de cuartil y las métricas calculadas.
 
 def ejecutar_query_1():
-    manager = query_manager()
+    manager = get_query_manager()
 
     """
     Divide los viajes pagados con tarjeta de crédito en 4 cuartiles por distancia.
@@ -64,7 +64,7 @@ except Exception as e:
 # cayeron en embotellamiento y el porcentaje que estos representan. Ordena de peor a mejor porcentaje.
 
 def ejecutar_query_2():
-    manager = query_manager()
+    manager = get_query_manager()
     """
     Identifica a qué hora del día la ciudad sufre los peores embotellamientos.
     """
@@ -125,7 +125,7 @@ except Exception as e:
 # inmediatamente anterior y el porcentaje de variación.
 
 def ejecutar_query_3():
-    manager = query_manager()
+    manager = get_query_manager()
     """
     Evalúa la estacionalidad del servicio calculando la tasa de crecimiento mensual. Para cada mes del ultimo trimestre del año 2019, muestra el mes, el total de viajes de ese mes, el total de viajes del mes inmediatamente anterior y el porcentaje de variación.
     """
@@ -182,7 +182,7 @@ else:
 # el promedio de la tarifa base y el porcentaje que representa la propina sobre el monto total.
 
 def ejecutar_query_4():
-    manager = query_manager()
+    manager = get_query_manager()
 
     """¿la gente da mejores propinas los fines de semana? Clasifica los viajes pagados con tarjeta de crédito en ”Fin de Semana”(Sábado y Domingo) y ”Día Laborable”(Lunes a Viernes basándote en la fecha de recogida. Calcula para ambos grupos el número de viajes, el promedio de la tarifa base y el porcentaje que representa la propina sobre el monto total """
 
@@ -252,7 +252,7 @@ else:
 
 def ejecutar_query_5():
     
-    manager = query_manager()
+    manager = get_query_manager()
     """Analiza cómo afecta el recargo por congestión a la estructura de costos del pasajero. Clasifica los viajes en Cortos”(menos de 2 millas), ”Medios”(entre 2 y 8 millas) y ”Largos”(más de 8 millas)."""
 
     sql = """
