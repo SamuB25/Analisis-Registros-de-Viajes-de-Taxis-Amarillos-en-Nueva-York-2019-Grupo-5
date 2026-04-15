@@ -1,6 +1,7 @@
 # Cuestionario SQL 
 import streamlit as st
 import pandas as pd
+import plotly.express as px
 from App_taxis_ny.src.query_manager import query_manager
 
     # 1. Cuartiles por Distancia y Comportamiento de Propinas
@@ -70,7 +71,7 @@ def ejecutar_query_2():
     
     # La función "cast" en este caso nos permite convertir la hora a una variable INT lo que me parece acorde dado que luego tendre que ver las mph.
     # Se había planteado utilizar la función epoch pues se investigo que convertiría las horas a segundos pero gracias a problemas con el mismo se tuvo que buscar otra opción (DATEDIFF).
-    # Se definio "embotellamiento" como momento donde velocidad sea menos a 5mph (distancia/ tiempo menor a 5)
+    # Se definio "embotellamiento" como el momento donde velocidad sea menos a 5mph (distancia/ tiempo menor a 5)
 
     sql = """
     WITH Embotellamientos AS (
@@ -304,7 +305,7 @@ if df_resultado_5 is not None and not df_resultado_5.empty:
                 value=f"{row['Porcentaje Promedio Recargo (%)']}%",
                 help=f"Proporción promedio del recargo sobre el total pagado en viajes {row['Categoría de Viaje'].lower()}."
             )
-    import plotly.express as px
+    
     
     fig = px.bar(
         df_resultado_5,
