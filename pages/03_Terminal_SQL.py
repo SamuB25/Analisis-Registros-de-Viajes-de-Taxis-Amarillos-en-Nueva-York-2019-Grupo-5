@@ -1,24 +1,8 @@
 # Cuestionario SQL 
-import duckdb
-import sys
-import os
+import streamlit as st
+import pandas as pd
+from App_taxis_ny.src.query_manager import query_manager
 
-# 1. Obtenemos la ruta de 'pages'
-directorio_actual = os.path.dirname(os.path.abspath(__file__))
-
-# 2. Subimos UN nivel para llegar a la Raíz (donde están ambas carpetas)
-ruta_raiz = os.path.dirname(directorio_actual)
-
-# 3. Añadimos la Raíz al radar de Python
-if ruta_raiz not in sys.path:
-    sys.path.insert(0, ruta_raiz)
-
-# 4. AHORA EL IMPORT (Desde la raíz, entramos a App_taxis_ny -> src)
-try:
-    from App_taxis_ny.src.query_manager import query_manager
-    print("✅ Conexión establecida: Ahora pages y App_taxis ya se hablan.")
-except Exception as e:
-    print(f"❌ Error de ruta: {e}")
 def ejecutar_pregunta_1():
     manager = query_manager()
     """
@@ -32,27 +16,25 @@ def ejecutar_pregunta_1():
     #  promedio y el porcentaje promedio que representa la propina respecto al monto total.
     # Muestra el número de cuartil y las métricas calculadas.
 
-    # El JOIN es vital: 'viaje' tiene la distancia, 'finanzas' tiene los montos.
 
     sql = """
         WITH datos_unidos AS (
             SELECT 
-                rv.trip_distance, 
-                fv.fare_amount, 
-                fv.tip_amount, 
-                fv.total_amount,
-                NTILE(4) OVER (ORDER BY rv.trip_distance) AS num_cuartil
-            FROM registro_viajes rv
-            -- Unimos directamente por el ID único del viaje
-            JOIN finanzas_viaje fv ON rv.trip_id = fv.trip_id
-            JOIN metodo_pago mp ON rv.payment_type_id = mp.payment_type_id
-            WHERE mp.descripcion ILIKE 'Credit card'
-              AND fv.total_amount > 0
+                v.trip_distance, 
+                f.fare_amount, 
+                f.tip_amount, 
+                f.total_amount,
+                NTILE(4) OVER (ORDER BY v.trip_distance) AS num_cuartil
+            FROM viaje v
+            JOIN finanzas f ON v.trip_id = f.trip_id
+            JOIN pagos p ON v.payment_type_id = p.payment_type_id
+            WHERE p.descripcion ILIKE 'Credit card'
+              AND f.total_amount > 0
         )
         SELECT 
             num_cuartil AS "Cuartil",
             ROUND(AVG(trip_distance), 2) AS "Distancia Promedio",
-            ROUND(AVG(fare_amount), 2) AS "Tarifa Promedio",
+            ROUND(AVG(fare_amount), 2) AS "Tarifa Promedio (USD)",
             ROUND(AVG((tip_amount * 100.0) / total_amount), 2) AS "Propina %"
         FROM datos_unidos
         GROUP BY num_cuartil
@@ -60,20 +42,20 @@ def ejecutar_pregunta_1():
         """
     return manager.execute_query(sql)
 
+#como ya no estamos trabajando con direcciones eliminamos eso pues el import de App_.... debería funcionar
+# Anexas una interfaz para que se vizualice el resultado consultado de manera correcta a petición del grupo
+st.title("Query nro 1. Cuartiles de Distancia y Comportamiento de Propinas")
+st.subheader("Resultados:")     
+try:
+    df_resultado = ejecutar_pregunta_1()
+    if df_resultado.empty:
+        st.warning("No se encontraron datos para la consulta.")
+    else:
+        st.dataframe(df_resultado)
+        st.caption("En el primer cuartil (el cual equivale a los viajes con un distancia más corta) es el que mayor porcentaje de propinas con un 15.41% a diferencia de cuarto cuartil que contiene las distancias promedio mas altas pero el porcentaje de propinas entre los cuatro cuartiles con unn 14.82%") 
+except Exception as e:
+    st.error(f"Ocurrió un error al ejecutar la consulta: {e}")
 
-# Bloque de ejecución principal
-if __name__ == "__main__":
-    print("\n--- EJECUTANDO CONSULTA 1: CUARTILES Y PROPINAS ---")
-    try:
-        df_resultado = ejecutar_pregunta_1()
-        if df_resultado.empty:
-            print("⚠️ La consulta no devolvió resultados. Revisa los filtros o los JOINs.")
-        else:
-            print(df_resultado)
-    except Exception as e:
-        print(f"❌ Error crítico al procesar los datos: {e}")
-
-        
 # 2. Análisis de Embotellamientos Críticos por Hora
 # Enunciado: Identifica a qué hora del día la ciudad sufre los peores embotellamientos. Define
 # un embotellamiento como un viaje de más de 1 milla de distancia donde la velocidad promedio
