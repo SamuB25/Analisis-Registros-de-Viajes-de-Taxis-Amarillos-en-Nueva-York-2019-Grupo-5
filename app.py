@@ -6,6 +6,7 @@ from src.stats_logic import (
     get_average_metrics, get_passenger_distribution, 
     get_usage_frequencies, get_location_ranking
 )
+from scr.drive_conn import preparar_data_lake
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="NYC Taxi Night Shift", layout="wide")
