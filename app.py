@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
-from App_taxis_ny.src.query_manager import query_manager
-from App_taxis_ny.src.stats_logic import (
+from src.query_manager import query_manager
+from src.stats_logic import (
     BICKLE_PALETTE, get_accent_color, format_kpi,
     get_average_metrics, get_passenger_distribution, 
     get_usage_frequencies, get_location_ranking

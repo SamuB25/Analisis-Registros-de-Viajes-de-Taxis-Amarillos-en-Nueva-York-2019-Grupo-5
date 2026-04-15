@@ -1,7 +1,7 @@
 # Cuestionario SQL 
 import streamlit as st
 import pandas as pd
-from App_taxis_ny.src.query_manager import query_manager
+from src.query_manager import query_manager
 
 def ejecutar_pregunta_1():
     manager = query_manager()
