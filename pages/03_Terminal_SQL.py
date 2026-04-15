@@ -182,6 +182,9 @@ else:
 
 def ejecutar_query_4():
     manager = query_manager()
+
+    """¿la gente da mejores propinas los fines de semana? Clasifica los viajes pagados con tarjeta de crédito en ”Fin de Semana”(Sábado y Domingo) y ”Día Laborable”(Lunes a Viernes basándote en la fecha de recogida. Calcula para ambos grupos el número de viajes, el promedio de la tarifa base y el porcentaje que representa la propina sobre el monto total """
+
     sql = """
     WITH ViajesTarjeta AS (
         SELECT 
@@ -217,7 +220,27 @@ def ejecutar_query_4():
     return manager.execute_query(sql)
 
 st.title("Query nro 4. Comportamiento de Propinas: Fines de Semana vs. Días Laborables")
-st.subheader("Resultados:")     
+st.subheader("Resultados:")
+
+df_resultado_4 = ejecutar_query_4()
+
+if df_resultado_4 is not None and not df_resultado_4.empty:
+    st.write("### Resumen Comparativo")
+    st.dataframe(df_resultado_4, use_container_width=True)
+
+    st.write("### Métricas Clave")
+    col1, col2 = st.columns(2)
+
+    for i, row in df_resultado_4.iterrows():
+        target_col = col1 if row['tipo_dia'] == 'Fin de Semana' else col2
+        with target_col:
+            st.metric(
+                label=row['tipo_dia'], 
+                value=f"{row['porcentaje_propina_total']}% propina",
+                delta=f"{row['promedio_tarifa_base']} tarifa prom."
+            )
+else:
+    st.error("No se pudieron obtener datos para el análisis de propinas.")
 
 # 5. Impacto del Recargo por Congestión según la Longitud del Viaje
 # Enunciado: Analiza cómo afecta el recargo por congestión a la estructura de costos del
@@ -227,9 +250,9 @@ st.subheader("Resultados:")
 # recargo sea cero o nulo.
 
 def ejecutar_pregunta_5():
-    
     manager = query_manager()
-    
+    """Analiza cómo afecta el recargo por congestión a la estructura de costos del pasajero. Clasifica los viajes en Cortos”(menos de 2 millas), ”Medios”(entre 2 y 8 millas) y ”Largos”(más de 8 millas)."""
+
     sql = """
     WITH ClasificacionViajes AS (
         SELECT 
