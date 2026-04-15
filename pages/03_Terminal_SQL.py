@@ -3,19 +3,19 @@ import streamlit as st
 import pandas as pd
 from App_taxis_ny.src.query_manager import query_manager
 
-def ejecutar_query_1():
-    manager = query_manager()
-    """
-    Divide los viajes pagados con tarjeta de crédito en 4 cuartiles por distancia.
-    Calcula distancia promedio, tarifa promedio y % de propina.
-    """
-
     # 1. Cuartiles por Distancia y Comportamiento de Propinas
     # Enunciado: Divide todos los viajes pagados con tarjeta de crédito en 4 cuartiles basados 
     # en la distancia del viaje. Para cada cuartil, calcula la distancia promedio, el monto de tarifa
     #  promedio y el porcentaje promedio que representa la propina respecto al monto total.
     # Muestra el número de cuartil y las métricas calculadas.
 
+def ejecutar_query_1():
+    manager = query_manager()
+
+    """
+    Divide los viajes pagados con tarjeta de crédito en 4 cuartiles por distancia.
+    Calcula distancia promedio, tarifa promedio y % de propina.
+    """
 
     sql = """
         WITH datos_unidos AS (
@@ -42,8 +42,7 @@ def ejecutar_query_1():
         """
     return manager.execute_query(sql)
 
-# como ya no estamos trabajando con direcciones eliminamos eso pues el import de App_.... debería funcionar
-# Anexas una interfaz para que se vizualice el resultado consultado de manera correcta a petición del grupo
+# Anexar una interfaz para que se vizualice el resultado consultado de manera correcta
 st.title("Query nro 1. Cuartiles de Distancia y Comportamiento de Propinas")
 st.subheader("Resultados:")     
 try:
@@ -70,9 +69,7 @@ def ejecutar_query_2():
     """
     
     # La función "cast" en este caso nos permite convertir la hora a una variable INT lo que me parece acorde dado que luego tendre que ver las mph.
-
     # Se había planteado utilizar la función epoch pues se investigo que convertiría las horas a segundos pero gracias a problemas con el mismo se tuvo que buscar otra opción (DATEDIFF).
-
     # Se definio "embotellamiento" como momento donde velocidad sea menos a 5mph (distancia/ tiempo menor a 5)
 
     sql = """
@@ -186,7 +183,7 @@ else:
 
 def ejecutar_query_4():
     manager = query_manager()
-    query_4 = """
+    sql = """
     WITH ViajesTarjeta AS (
         SELECT 
             r.trip_id,
@@ -196,7 +193,7 @@ def ejecutar_query_4():
             f.total_amount,
             CAST(EXTRACT(ISODOW FROM TRY_CAST(r.pickup_date AS DATE)) AS INT) as dia_semana
         FROM 
-            viaje v
+            viaje r
         JOIN 
             finanzas f ON r.trip_id = f.trip_id
         WHERE 
@@ -218,8 +215,7 @@ def ejecutar_query_4():
     ORDER BY 
         tipo_dia DESC
     """
-    return manager.execute_query(query_4)
-
+    return manager.execute_query(sql)
 
 
 # 5. Impacto del Recargo por Congestión según la Longitud del Viaje
@@ -230,7 +226,7 @@ def ejecutar_query_4():
 # recargo sea cero o nulo.
 
 def ejecutar_pregunta_5():
-    # Instanciamos el manager 
+    
     manager = query_manager()
     
     sql = """
@@ -266,6 +262,3 @@ def ejecutar_pregunta_5():
     """
     
     return manager.execute_query(sql)
-
-# Puedes probar si funciona imprimiendo el resultado así:
-print(ejecutar_pregunta_5())
