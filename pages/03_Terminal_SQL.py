@@ -290,3 +290,37 @@ def ejecutar_query_5():
 
 st.title("Query nro 5. Impacto del Recargo por Congestión según la Longitud del Viaje")
 st.subheader("Resultados:")
+
+df_resultado_5 = ejecutar_query_5()
+
+if df_resultado_5 is not None and not df_resultado_5.empty:
+    st.write("### Impacto en el costo total")
+    cols = st.columns(len(df_resultado_5))
+
+    for i, row in df_resultado_5.iterrows():
+        with cols[i]:
+            st.metric(
+                label=row["Categoría de Viaje"],
+                value=f"{row['Porcentaje Promedio Recargo (%)']}%",
+                help=f"Proporción promedio del recargo sobre el total pagado en viajes {row['Categoría de Viaje'].lower()}."
+            )
+    import plotly.express as px
+    
+    fig = px.bar(
+        df_resultado_5,
+        x="Categoría de Viaje",
+        y="Porcentaje Promedio Recargo (%)",
+        text="Porcentaje Promedio Recargo (%)",
+        title="Peso del Recargo por Congestión en el Ticket Total",
+        labels={"Porcentaje Promedio Recargo (%)": "Impacto (%)"},
+        color="Categoría de Viaje",
+        color_discrete_sequence=px.colors.qualitative.Pastel
+    )
+    fig.update_traces(textposition='outside')
+    st.plotly_chart(fig, use_container_width=True)
+
+    max_impacto = df_resultado_5.iloc[0]["Categoría de Viaje"]
+    st.info(f"**Análisis:** El recargo por congestión impacta proporcionalmente más a los viajes **{max_impacto}**, ya que representa una porción más grande del costo total comparado con viajes de larga distancia.")
+
+else:
+    st.warning("No se encontraron registros financieros con recargos aplicados.")
