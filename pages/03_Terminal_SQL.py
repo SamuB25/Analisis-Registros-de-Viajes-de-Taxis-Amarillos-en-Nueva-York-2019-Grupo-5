@@ -249,7 +249,8 @@ else:
 # total que es consumido exclusivamente por el recargo de congestión. Excluye viajes donde el
 # recargo sea cero o nulo.
 
-def ejecutar_pregunta_5():
+def ejecutar_query_5():
+    
     manager = query_manager()
     """Analiza cómo afecta el recargo por congestión a la estructura de costos del pasajero. Clasifica los viajes en Cortos”(menos de 2 millas), ”Medios”(entre 2 y 8 millas) y ”Largos”(más de 8 millas)."""
 
