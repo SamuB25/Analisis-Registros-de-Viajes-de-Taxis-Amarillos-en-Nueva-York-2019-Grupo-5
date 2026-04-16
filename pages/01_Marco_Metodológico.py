@@ -9,9 +9,36 @@ def cache_imagenes(path):
     """
     return Image.open(path)
 
+st.markdown("""
+    <style>
+    .justificado {
+        text-align: justify;
+    }
+    .destaque {
+        color: #F2BC1B; /* Tu amarillo taxi */
+        font-weight: bold;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("Planteamiento del Problema y Marco Metodológico")
+st.markdown("---")
+
+st.header("1.1. Planteamiento del Problema")
+with st.container():
+    st.markdown("""La dinámica urbana de grandes metrópolis como Nueva York se fundamenta en sistemas de transporte masivos y selectivos que generan volúmenes masivos de datos cada segundo. Dentro de este ecosistema, los Yellow Taxis representan un pilar histórico y logístico cuya operatividad no solo refleja la movilidad de la ciudad, sino también el comportamiento socioeconómico de sus usuarios en contextos temporales específicos.
+    En la actualidad, el análisis de grandes bases de datos (Big Data) se ha convertido en una necesidad intelectual y vital para comprender fenómenos complejos. Sin embargo, a pesar de la disponibilidad de registros detallados proporcionados por la Taxi & Limousine Commission (TLC), los datos crudos a menudo presentan inconsistencias o redundancias que dificultan su interpretación directa. Para que el conocimiento sea considerado científico, este debe ser metódicamente obtenido y sistemáticamente organizado , lo que exige procesos rigurosos de normalización y transformación digital (ETL) antes de proceder a cualquier análisis estadístico.
+    Específicamente durante el trimestre octubre-diciembre de 2019, se observa una fluctuación considerable en la demanda del servicio. Surge entonces una interrogante sobre cómo factores temporales, particularmente la variable "hora", condicionan el comportamiento del pasajero en términos de consumo y movilidad. El desconocimiento de los patrones diferenciados entre los periodos de alta demanda (Hora Pico) y periodos regulares (Hora No Pico) representa un vacío de información que impide la construcción de perfiles de usuario precisos.
+    Sin un análisis descriptivo profundo que segmente estos registros, la información permanece como un conjunto de datos aislados sin utilidad práctica para la toma de decisiones estratégicas o la optimización del servicio. Por tanto, se requiere una investigación que, mediante el uso de herramientas tecnológicas avanzadas como Power BI y Streamlit, permita caracterizar la estructura de comportamiento de este universo de estudio.
+    """)
+    st.markdown("---")
+
+st.header("1.2. La Pregunta de Investigación")
+with st.container():
+    st.markdown("""¿Cómo varía el comportamiento de los pasajeros de los Yellow Taxis de Nueva York según el factor horario (Hora Pico vs. Hora No Pico) durante el trimestre octubre-diciembre del año 2019?""")
 # Sección de presentación del equipo
-st.header("Conoce al grupo 5. Los encargados de transformar el caos de NYC en DATOS")
-st.write("El equipo detrás de la arquitectura, análisis y estrategia del proyecto.")
+st.header("Conoce a nuestro equipo de investigación y desarrollo (grupo 5)")
+st.write("Los encargados de transformar el caos de NYC en DATOS")
 
 # FILA 1
 col1, col2 = st.columns(2, gap="large")
@@ -47,4 +74,4 @@ with col4:
 
 # Sección del Pie de Página
 st.markdown("---")
-st.markdown("<center>Escuela de Estadística y Ciencias Actuarias - UCV 2026</center>", unsafe_allow_html=True)
+st.markdown("<center>Escuela de Estadística y Ciencias Actuariales - UCV 2026</center>", unsafe_allow_html=True)
