@@ -125,18 +125,17 @@ def get_dynamic_insight(kpis, tipo_horario):
 @st.cache_data
 def get_global_destination_stats(_qm, tipo_horario, mes_filtro):
     """
-    Obtiene la totalidad de destinos con su frecuencia y tarifa promedio.
-    Utiliza los nombres exactos de las tablas: registro_viajes, localizacion_viaje y finanzas_viaje.
+    Obtiene la totalidad de destinos, su frecuencia y el TOTAL promedio pagado.
     """
     filtro = build_sql_filter(tipo_horario, mes_filtro)
     
-    # Query corregida con los nombres reales de las tablas de tu BD
+    # Usamos total_amount (Gasto real del cliente)
     query = f"""
         SELECT 
             l.borough AS Distrito,
             l.zone AS Zona,
             COUNT(v.trip_id) AS Frecuencia,
-            AVG(f.total_amount) AS Tarifa_Promedio
+            AVG(f.total_amount) AS Gasto_Promedio
         FROM registro_viajes v
         JOIN localizacion_viaje l ON v.do_location_id = l.location_id
         JOIN finanzas_viaje f ON v.trip_id = f.trip_id
@@ -147,11 +146,20 @@ def get_global_destination_stats(_qm, tipo_horario, mes_filtro):
     
     df = _qm.execute_query(query)
     
-    # Verificación de seguridad para evitar el error 'NoneType' o 'empty'
-    if df is not None and not df.empty:
-        total_viajes = df["Frecuencia"].sum()
-        df["Porcentaje (%)"] = (df["Frecuencia"] / total_viajes * 100).round(4)
-        df["Tarifa_Promedio"] = df["Tarifa_Promedio"].round(2)
-        return df
+    # --- EVITAR EL ERROR 'bool' ---
+    if df is None or isinstance(df, bool):
+        return pd.DataFrame() # Si hay error en SQL, devuelve un DF vacío para que la app no muera
+
+    if isinstance(df, pd.DataFrame) and df.empty:
+        return pd.DataFrame()
+
+    # Si es una lista o similar, lo forzamos a DataFrame
+    if not isinstance(df, pd.DataFrame):
+        df = pd.DataFrame(df)
+
+    # Pesos estadísticos
+    total_viajes = df["Frecuencia"].sum()
+    df["Peso_Relativo (%)"] = (df["Frecuencia"] / total_viajes * 100).round(4)
+    df["Gasto_Promedio"] = df["Gasto_Promedio"].round(2)
     
-    return pd.DataFrame() # Retorna un dataframe vacío si no hay datos
+    return df

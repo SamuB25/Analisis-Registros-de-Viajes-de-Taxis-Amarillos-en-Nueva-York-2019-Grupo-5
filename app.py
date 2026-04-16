@@ -143,37 +143,40 @@ if not df_destinos.empty:
 st.header("Análisis Global de Destinos")
 st.write("Visualización de la totalidad de zonas de Nueva York según volumen de viajes y rentabilidad.")
 
-# Obtener la totalidad de los datos
 df_global = get_global_destination_stats(qm, tipo_horario, mes_filtro)
 
 if not df_global.empty:
-    # BLOQUEO DE NEGATIVOS: Calculamos el máximo real para la escala
-    max_tarifa = df_global["Tarifa_Promedio"].max()
+    # Determinamos el rango real para evitar escalas negativas
+    max_gasto = df_global["Gasto_Promedio"].max()
 
     fig_global = px.treemap(
         df_global,
         path=[px.Constant("Nueva York"), "Distrito", "Zona"], 
         values="Frecuencia",
-        color="Tarifa_Promedio",
-        # Escala térmica para representar rentabilidad
-        color_continuous_scale="YlOrRd", 
-        # SOLUCIÓN: Forzamos el rango de 0 al máximo para evitar valores negativos
-        range_color=[0, max_tarifa if max_tarifa > 0 else 1],
-        title="Mapa de Intensidad: Volumen de Viajes por Tamaño y Tarifa por Color",
+        color="Gasto_Promedio",
+        color_continuous_scale="YlOrRd", # Amarillo a Rojo (Estilo Taxi)
+        # SOLUCIÓN: Forzamos el rango de 0 al máximo para que no aparezca el "-0.4%"
+        range_color=[0, max_gasto if max_gasto > 0 else 1],
+        title="Inversión Promedio del Pasajero por Zona de Destino",
         hover_data={
             "Frecuencia": True,
-            "Porcentaje (%)": ":.4f",
-            "Tarifa_Promedio": ":$.2f",
+            "Peso_Relativo (%)": ":.4f",
+            "Gasto_Promedio": ":$.2f",
             "Distrito": True
         }
     )
 
-    # Configuración del detalle al punzar con el mouse
+    # Configuración del "Hover" (lo que se ve al pasar el mouse)
     fig_global.update_traces(
         textinfo="label+value",
-        hovertemplate="<b>%{label}</b><br>Viajes: %{value}<br>Peso: %{customdata[1]}%<br>Tarifa Prom: %{customdata[2]}"
+        hovertemplate="""
+        <b>Zona: %{label}</b><br>
+        Viajes Realizados: %{value}<br>
+        Peso en la Demanda: %{customdata[1]}%<br>
+        <b>Total Pagado Promedio: %{customdata[2]}</b>
+        """
     )
     
     st.plotly_chart(fig_global, use_container_width=True)
 else:
-    st.warning("No se encontraron datos para los filtros seleccionados.")
+    st.warning("⚠️ No se han encontrado registros financieros para este filtro.")
