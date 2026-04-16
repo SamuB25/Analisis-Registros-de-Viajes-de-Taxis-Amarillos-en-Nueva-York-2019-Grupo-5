@@ -126,10 +126,11 @@ def get_dynamic_insight(kpis, tipo_horario):
 def get_global_destination_stats(_qm, tipo_horario, mes_filtro):
     """
     Obtiene la totalidad de destinos con su frecuencia y tarifa promedio.
+    Utiliza los nombres exactos de las tablas: registro_viajes, localizacion_viaje y finanzas_viaje.
     """
     filtro = build_sql_filter(tipo_horario, mes_filtro)
     
-    # Query que une los hechos (viajes/finanzas) con la dimensión (localización)
+    # Query corregida con los nombres reales de las tablas de tu BD
     query = f"""
         SELECT 
             l.borough AS Distrito,
@@ -143,12 +144,14 @@ def get_global_destination_stats(_qm, tipo_horario, mes_filtro):
         GROUP BY 1, 2
         ORDER BY 3 DESC
     """
+    
     df = _qm.execute_query(query)
     
-    if not df.empty:
-        # Calculamos el total global para porcentajes exactos
+    # Verificación de seguridad para evitar el error 'NoneType' o 'empty'
+    if df is not None and not df.empty:
         total_viajes = df["Frecuencia"].sum()
         df["Porcentaje (%)"] = (df["Frecuencia"] / total_viajes * 100).round(4)
         df["Tarifa_Promedio"] = df["Tarifa_Promedio"].round(2)
-        
-    return df
+        return df
+    
+    return pd.DataFrame() # Retorna un dataframe vacío si no hay datos
