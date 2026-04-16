@@ -11,9 +11,8 @@ from src.stats_logic import (
     get_location_analysis,    # La tabla del Top 5 destinos
     get_dynamic_insight,     # La reseña del asistente
     get_passenger_distribution, # El gráfico de barras de pasajeros
-    get_usage_frequencies,
-    get_global_destination_stats       # El gráfico de métodos de pago
-)
+    get_usage_frequencies
+    )
 
 st.set_page_config(
     page_title="NYC Taxi Insights - Grupo 5",
