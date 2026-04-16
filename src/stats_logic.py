@@ -45,14 +45,15 @@ def build_sql_filter(tipo_horario="Vista General", mes="Todos"):
 
 @st.cache_data
 def get_average_metrics(_qm, tipo_horario, mes):
-    """Calcula promedios para las Cards superiores[cite: 10, 38]."""
+    """Calcula promedios para las Cards superiores."""
     filtro = build_sql_filter(tipo_horario, mes)
     query = f"""
         SELECT 
             COUNT(v.trip_id) as total_viajes,
             AVG(v.trip_distance) as avg_distance,
             AVG(f.fare_amount) as avg_fare,
-            AVG(f.tip_amount) as avg_tip
+            AVG(f.tip_amount) as avg_tip,
+            AVG(f.total_amount) as avg_total
         FROM viaje v
         JOIN finanzas f ON v.trip_id = f.trip_id
         WHERE {filtro} AND f.total_amount > 0

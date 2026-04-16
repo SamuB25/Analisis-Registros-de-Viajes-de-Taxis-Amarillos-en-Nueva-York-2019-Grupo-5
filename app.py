@@ -50,12 +50,13 @@ with st.sidebar:
 st.title(f"Dashboard: {tipo_horario}")
 kpis = get_average_metrics(qm, tipo_horario, mes_filtro)
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 # Números en Taxi Yellow sobre el fondo oscuro
 col1.metric("Viajes Totales", format_kpi(kpis["total_viajes"]))
-col2.metric("Distancia Promedio", f"{format_kpi(kpis['avg_distance'])} mi")
+col2.metric("Distancia Promedio", f"{format_kpi(kpis['avg_distance'])} millas")
 col3.metric("Tarifa Promedio", format_kpi(kpis["avg_fare"], True))
 col4.metric("Propina Promedio", format_kpi(kpis["avg_tip"], True))
+col5.metric("Ingreso Total Promedio", format_kpi(kpis["avg_total"], True))
 
 # Reseña Interactiva (Insight dinámico del perfil)
 st.chat_message("assistant").write(get_dynamic_insight(kpis, tipo_horario))
