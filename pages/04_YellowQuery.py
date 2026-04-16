@@ -48,29 +48,119 @@ def set_query(nueva_query):
     st.rerun()
 
 st.subheader("💡 Sugerencias Personalizadas")
-c1, c2, c3 = st.columns(3)
+c1, c2, c3, c4 = st.columns(4)
 
 with c1:
-    if st.button("📍 Destinos por Gasto Total"):
-        set_query("""SELECT l.zone as Zona, AVG(f.total_amount) as Gasto_Promedio 
-FROM registro_viajes v 
-JOIN finanzas_viaje f ON v.trip_id = f.trip_id 
-JOIN localizacion_viaje l ON v.do_location_id = l.location_id 
-GROUP BY 1 ORDER BY 2 DESC LIMIT 10""")
+    if st.button("Cuartiles por Distancia y Comportamiento de Propinas"):
+        set_query("""SELECT 
+                v.trip_distance, 
+                f.fare_amount, 
+                f.tip_amount, 
+                f.total_amount,
+                NTILE(4) OVER (ORDER BY v.trip_distance) AS num_cuartil
+            FROM viaje v
+            JOIN finanzas f ON v.trip_id = f.trip_id
+            JOIN pagos p ON v.payment_type_id = p.payment_type_id
+            WHERE p.descripcion ILIKE 'Credit card'
+              AND f.total_amount > 0
+        )
+        SELECT 
+            num_cuartil AS "Cuartil",
+            ROUND(AVG(trip_distance), 2) AS "Distancia Promedio",
+            ROUND(AVG(fare_amount), 2) AS "Tarifa Promedio (USD)",
+            ROUND(AVG((tip_amount * 100.0) / total_amount), 2) AS "Propina %"
+        FROM datos_unidos
+        GROUP BY num_cuartil
+        ORDER BY num_cuartil""")
 
 with c2:
-    if st.button("💰 Propinas por Pago"):
-        set_query("""SELECT m.descripcion as Metodo, AVG(f.tip_amount) as Propina_Media 
-FROM finanzas_viaje f 
-JOIN metodo_pago m ON f.payment_type_id = m.payment_type_id 
-GROUP BY 1 ORDER BY 2 DESC""")
+    if st.button("Análisis de Embotellamientos Críticos por Hora"):
+        set_query("""WITH Embotellamientos AS (
+        SELECT 
+            CAST(EXTRACT(HOUR FROM TRY_CAST(pickup_time AS TIME)) AS INT) AS hora,
+            trip_distance,
+            (DATEDIFF('second', TRY_CAST(pickup_time AS TIME), TRY_CAST(dropoff_time AS TIME)) / 3600.0) AS duracion_horas
+        FROM viaje
+        WHERE pickup_time IS NOT NULL 
+          AND dropoff_time IS NOT NULL 
+          AND trip_distance > 1.0
+    ),
+    Metricas AS (
+        SELECT
+            hora,
+            COUNT(*) AS total_viajes,
+            SUM(CASE WHEN (trip_distance / NULLIF(duracion_horas, 0)) < 5.0 THEN 1 ELSE 0 END) AS viajes_embotellados
+            FROM Embotellamientos
+            GROUP BY hora
+    ) 
+    SELECT
+        hora AS "Hora",
+        total_viajes AS "Total Viajes",
+        viajes_embotellados AS "Viajes en embotellamiento",
+        ROUND((viajes_embotellados * 100.0) / total_viajes, 2) AS "porcentaje %"
+    FROM Metricas
+    ORDER BY "Porcentaje %" DESC""")
 
 with c3:
-    if st.button("🚕 Viajes Largos por Distrito"):
-        set_query("""SELECT l.borough as Distrito, MAX(v.trip_distance) as Distancia_Max 
-FROM registro_viajes v 
-JOIN localizacion_viaje l ON v.pu_location_id = l.location_id 
-GROUP BY 1 ORDER BY 2 DESC""")
+    if st.button("Crecimiento Intermensual (MoM) de la Demanda"):
+        set_query("""WITH Mensual AS (
+    SELECT
+        EXTRACT(MONTH FROM TRY_CAST(pickup_date AS DATE)) AS mes,
+        COUNT(*) AS total_viajes
+    FROM viaje
+    WHERE pickup_date IS NOT NULL
+    GROUP BY mes
+    ),
+    Crecimiento AS (
+        SELECT
+            mes,
+            total_viajes,
+            LAG(total_viajes) OVER (ORDER BY mes) AS viajes_mes_anterior
+        FROM Mensual
+    )
+    SELECT
+        CAST(mes AS INT) AS "Mes",
+        total_viajes AS "Total Viajes",
+        viajes_mes_anterior AS "Viajes Mes Anterior",
+        COALESCE(
+            ROUND(((total_viajes - viajes_mes_anterior) * 100.0) / NULLIF(viajes_mes_anterior, 0), 2), 0.0) AS "Variacion %"
+    FROM Crecimiento
+    WHERE mes BETWEEN 10 AND 12
+    ORDER BY mes DESC""")
+        
+with c4:
+    if st.button("Comportamiento de Propinas: Fines de Semana vs. Días Laborables"):
+        set_query("""WITH ViajesTarjeta AS (
+        SELECT 
+            v.trip_id,
+            v.pickup_date,
+            f.fare_amount,
+            f.tip_amount,
+            f.total_amount,
+            CAST(EXTRACT(ISODOW FROM TRY_CAST(v.pickup_date AS DATE)) AS INT) as dia_semana
+        FROM 
+            viaje v
+        JOIN 
+            finanzas f ON v.trip_id = f.trip_id
+        WHERE 
+            v.payment_type_id = 1 
+            AND f.total_amount > 0
+    )
+    SELECT 
+        CASE 
+            WHEN dia_semana IN (6, 7) THEN 'Fin de Semana'
+            ELSE 'Día Laborable'
+        END AS tipo_dia,
+        COUNT(trip_id) AS numero_viajes,
+        ROUND(AVG(fare_amount), 2) AS promedio_tarifa_base,
+        ROUND((SUM(tip_amount) / SUM(total_amount)) * 100, 2) AS porcentaje_propina_total
+    FROM 
+        ViajesTarjeta
+    GROUP BY 
+        tipo_dia
+    ORDER BY 
+        tipo_dia DESC""") 
+
 
 # --- 4. LA CONSOLA INTERACTIVA ---
 query_usuario = st.text_area("SQL Terminal:", value=st.session_state.query_input, height=150)
