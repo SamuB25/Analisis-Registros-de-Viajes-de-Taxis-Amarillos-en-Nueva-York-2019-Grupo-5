@@ -123,3 +123,17 @@ def get_dynamic_insight(kpis, tipo_horario):
     else:
         return f"🌙 **Perfil Valle:** Se observa una distancia promedio de {format_kpi(kpis['avg_distance'])} mi. Los viajes son más largos, posiblemente hacia zonas residenciales."
     
+#FUNCIONES PARA YELLOW QUERY
+
+def execute_custom_query(_qm, raw_query):
+    """
+    Ejecuta cualquier sentencia SQL enviada desde la UI.
+    Blindada con Try-Except para evitar que la app explote por errores de sintaxis.
+    """
+    try:
+        #Damos uso esencial a nuestra librería principal, DUCK DB
+        df = _qm.execute_query(raw_query)
+        return df, None
+    except Exception as e:
+        # Si la query está mal escrita, devolvemos el error para mostrarlo en pantalla en la app
+        return None, str(e)
