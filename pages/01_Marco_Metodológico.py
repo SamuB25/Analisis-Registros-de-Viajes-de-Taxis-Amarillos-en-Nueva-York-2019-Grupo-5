@@ -37,7 +37,48 @@ with st.container():
 st.header("1.2. La Pregunta de Investigación")
 with st.container():
     st.markdown("""¿Cómo varía el comportamiento de los pasajeros de los Yellow Taxis de Nueva York según el factor horario (Hora Pico vs. Hora No Pico) durante el trimestre octubre-diciembre del año 2019?""")
-# Sección de presentación del equipo
+
+# PREGUNTA DE INVESTIGACIÓN
+st.markdown("""
+    <style>
+    .pregunta-container {
+        background-color: #121212; /* Asphalt Night */
+        border-left: 10px solid #F2BC1B; /* Borde Taxi Yellow */
+        padding: 30px;
+        border-radius: 10px;
+        margin: 40px 0px;
+        box-shadow: 0px 4px 15px rgba(242, 188, 27, 0.2);
+    }
+    .pregunta-texto {
+        color: #FFFFFF;
+        font-size: 24px;
+        font-weight: bold;
+        font-style: italic;
+        line-height: 1.5;
+        text-align: center;
+    }
+    .pregunta-label {
+        color: #F2BC1B;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 10px;
+        display: block;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- APLICACIÓN EN LA APP ---
+st.markdown("""
+    <div class="pregunta-container">
+        <span class="pregunta-label">Interrogante de Investigación</span>
+        <p class="pregunta-texto">
+            "¿Cómo varía el comportamiento de los pasajeros de los Yellow Taxis de Nueva York según el factor horario (Hora Pico vs. Hora No Pico) durante el trimestre octubre-diciembre del año 2019?"
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+#PRESENTACIÓN DEL EQUIPO DE DESARROLLO
 st.header("Conoce a nuestro equipo de investigación y desarrollo (grupo 5)")
 st.write("Los encargados de transformar el caos de NYC en DATOS")
 
