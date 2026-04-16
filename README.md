@@ -57,8 +57,9 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
-##  👑Visita nuestra App Streamlit
-https://3seczcpbtgr4mr4g5txcew.streamlit.app/
+##  👑Visita nuestra App en Streamlit
+[https://nyc2019eeca.streamlit.app/](https://nyc2019eeca.streamlit.app/)
+
 
 ## 👥 Créditos
 **Equipo Grupo 5 - EECA UCV**
