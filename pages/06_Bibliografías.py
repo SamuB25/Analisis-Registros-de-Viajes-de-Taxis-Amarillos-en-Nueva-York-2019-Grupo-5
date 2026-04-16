@@ -2,7 +2,7 @@ import streamlit as st
 
 st.title("Análisis del comportamiento de los pasajeros en horas pico en el sistema de transporte Yellow Cars de Nueva York (Octubre-Diciembre 2019)")
 
-st.header("Bibliografías")
+st.header("🔎Bibliografías")
 
 st.markdown("""
 - New York City taxi trips. (2020). Kaggle. https://www.kaggle.com/datasets/dhruvildave/new-york-city-taxi-trips-2019
