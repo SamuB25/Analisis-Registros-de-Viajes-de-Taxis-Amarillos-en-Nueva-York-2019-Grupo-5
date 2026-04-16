@@ -86,20 +86,38 @@ def get_usage_frequencies(_qm, tipo_horario, mes):
     return _qm.execute_query(query)
 
 @st.cache_data
-def get_location_ranking(_qm, tipo_horario, mes, top=True):
-    """Retorna el TOP 5 de destinos (Geografía de la Demanda)."""
+def get_location_analysis(_qm, tipo_horario, mes, top=True, n=5):
+    """
+    Retorna el análisis de destinos con frecuencias absolutas y relativas.
+    top=True -> Más frecuentados | top=False -> Menos frecuentados
+    """
     filtro = build_sql_filter(tipo_horario, mes)
     orden = "DESC" if top else "ASC"
     
-    # CORRECCIÓN: Quitamos la tilde a 'localizacion'
+    # Primero obtenemos el total para calcular la frecuencia relativa
+    total_query = f"SELECT COUNT(*) FROM viaje v WHERE {filtro}"
+    total_viajes = _qm.execute_query(total_query).iloc[0, 0]
+    
+    if total_viajes == 0:
+        return pd.DataFrame()
+
     query = f"""
-        SELECT l.zone as Zona, COUNT(*) as Frecuencia
+        SELECT 
+            l.zone as "Zona", 
+            COUNT(*) as "Frecuencia Absoluta (fᵢ)"
         FROM viaje v
         JOIN localizacion l ON v.do_location_id = l.location_id
         WHERE {filtro}
-        GROUP BY 1 ORDER BY 2 {orden} LIMIT 5
+        GROUP BY 1 
+        ORDER BY 2 {orden} 
+        LIMIT {n}
     """
-    return _qm.execute_query(query)
+    df = _qm.execute_query(query)
+    
+    # Calculamos la Frecuencia Relativa (%)
+    df["Frecuencia Relativa (%)"] = (df["Frecuencia Absoluta (fᵢ)"] / total_viajes * 100).round(2)
+    
+    return df
 
 @st.cache_data
 def get_dynamic_insight(kpis, tipo_horario):

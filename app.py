@@ -8,7 +8,7 @@ from src.stats_logic import (
     get_accent_color,        # El cambio a rojo en hora pico
     format_kpi,              # Formato de moneda y miles
     get_average_metrics,     # Los 4 números principales del tope
-    get_location_ranking,    # La tabla del Top 5 destinos
+    get_location_analysis,    # La tabla del Top 5 destinos
     get_dynamic_insight,     # La reseña del asistente
     get_passenger_distribution, # El gráfico de barras de pasajeros
     get_usage_frequencies       # El gráfico de métodos de pago
@@ -78,8 +78,45 @@ with col_der:
     st.bar_chart(df_pagos.set_index("Categoria"), color=accent)
     st.caption("*Nota: Los viajes con tarifa de $0 fueron removidos por limpieza de datos.*")
 
-# --- GEOGRAFÍA (Pie de Página) ---
-st.markdown("---")
-st.subheader("📍 Geografía de la Demanda (Top 5 Destinos)")
-df_destinos = get_location_ranking(qm, tipo_horario, mes_filtro)
-st.table(df_destinos)
+# --- UI en tu archivo de página ---
+st.subheader("📍 Geografía de la Demanda: Análisis de Destinos")
+
+col_controles, _ = st.columns([1, 2])
+with col_controles:
+    # Switch para invertir la lógica
+    ver_top = st.toggle("Ver destinos más frecuentados", value=True, help="Activa para ver el TOP, desactiva para ver los destinos con menor demanda.")
+
+# Llamada a la función
+tipo_ranking = "Más Frecuentados" if ver_top else "Menos Frecuentados"
+df_destinos = get_location_analysis(qm, tipo_horario, mes, top=ver_top)
+
+if not df_destinos.empty:
+    tab1, tab2 = st.tabs(["📊 Distribución de Frecuencias", "📑 Tabla de Datos"])
+    
+    with tab1:
+        # Gráfico de barras horizontal para mejor lectura de nombres de zonas
+        fig = px.bar(
+            df_destinos,
+            x="Frecuencia Absoluta (fᵢ)",
+            y="Zona",
+            orientation='h',
+            title=f"Distribución de Destinos {tipo_ranking}",
+            labels={"Frecuencia Absoluta (fᵢ)": "Número de Viajes", "Zona": "Destino"},
+            color="Frecuencia Relativa (%)",
+            color_continuous_scale="Viridis" if ver_top else "Reds",
+            text="Frecuencia Relativa (%)"
+        )
+        fig.update_traces(texttemplate='%{text}%', textposition='outside')
+        fig.update_layout(yaxis={'categoryorder':'total ascending'} if ver_top else {'categoryorder':'total descending'})
+        st.plotly_chart(fig, use_container_width=True)
+
+    with tab2:
+        st.write(f"### Cuadro de Distribución: {tipo_ranking}")
+        st.dataframe(
+            df_destinos.style.format({"Frecuencia Relativa (%)": "{:.2f}%"}),
+            use_container_width=True,
+            hide_index=True
+        )
+        st.caption(f"Nota: Los porcentajes se calculan en base al universo total de viajes para el filtro seleccionado.")
+else:
+    st.warning("No hay datos disponibles para los filtros seleccionados.")
