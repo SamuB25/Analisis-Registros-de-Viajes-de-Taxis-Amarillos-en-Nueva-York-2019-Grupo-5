@@ -61,6 +61,13 @@ streamlit run app.py
 [https://nyc2019eeca.streamlit.app/](https://nyc2019eeca.streamlit.app/)
 
 
+### 📊 Dashboard Interactivo (Versión Web Power Bi)
+Pueden visualizar el análisis de los 20 millones de viajes de Taxis NY aquí:
+[👉 Ver Dashboard en Vivo](https://app.powerbi.com/view?r=eyJrIjoiNDRiYjIwYzktMjJkZC00NzNkLWI0OTItYTgyNzg3NGVkM2I2IiwidCI6IjRjODE4Zjc5LWFiODQtNDU1Mi05YjdjLTJmZTcxNWIwZDBkNSIsImMiOjR9)
+
+
+
+
 ## 👥 Créditos
 **Equipo Grupo 5 - EECA UCV**
 - Victoria Díaz (@vicoandrediaz): Lógica de inserción/exportación por chunks y arquitectura del Data Lake. Desarrollo del de la app de Streamlit. 
