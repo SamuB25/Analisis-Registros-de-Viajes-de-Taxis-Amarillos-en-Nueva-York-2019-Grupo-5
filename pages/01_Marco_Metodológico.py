@@ -17,14 +17,13 @@ st.write("El equipo detrás de la arquitectura, análisis y estrategia del proye
 col1, col2 = st.columns(2, gap="large")
 
 with col1:
-    # Usamos '/' para que funcione en la nube (Linux)
-    img_vic = cache_imagenes("assets/teamcard_1.jpg") 
+    img_vic = cache_imagenes("assets/teamcard_1.png") 
     st.image(img_vic, use_container_width=True)
     st.markdown("### **Vico**")
     st.caption("Arquitecta de datos y líder de infraestructura.")
 
 with col2:
-    img_and = cache_imagenes("assets/teamcard_2.jpg")
+    img_and = cache_imagenes("assets/teamcard_2.png")
     st.image(img_and, use_container_width=True)
     st.markdown("### **Andrés**")
     st.caption("Estratega de BI y visualización ejecutiva.")
@@ -35,13 +34,13 @@ st.markdown("<br>", unsafe_allow_html=True) # Espacio entre filas
 col3, col4 = st.columns(2, gap="large")
 
 with col3:
-    img_sam = cache_imagenes("assets/teamcard_3.jpg")
+    img_sam = cache_imagenes("assets/teamcard_3.png")
     st.image(img_sam, use_container_width=True)
     st.markdown("### **Samuel**")
     st.caption("Gestor de integridad de datos y soporte SQL.")
 
 with col4:
-    img_yon = cache_imagenes("assets/teamcard_4.jpg")
+    img_yon = cache_imagenes("assets/teamcard_4.png")
     st.image(img_yon, use_container_width=True)
     st.markdown("### **Yonelvis**")
     st.caption("Motor lógico de métricas estadísticas y cuestionario.")
