@@ -18,22 +18,22 @@ col_vic, col_and, col_sam, col_yon = st.columns(4)
 
 # Ahora usamos la función cacheada en lugar de la ruta directa
 with col_vic:
-    img_vic = cache_imagenes("assets\teamcard_1.png")
+    img_vic = cache_imagenes("assets/teamcard_1.png")
     st.image(img_vic, use_container_width=True)
     st.caption("**Vico** - La cabeza detrás de la visualización")
 
 with col_and:
-    img_and = cache_imagenes("assets\teamcard_2.png")
+    img_and = cache_imagenes("assets/teamcard_2.png")
     st.image(img_and, use_container_width=True)
     st.caption("**Andrés** - El encargado del Power BI")
 
 with col_sam:
-    img_sam = cache_imagenes("assets\teamcard_3.png")
+    img_sam = cache_imagenes("assets/teamcard_3.png")
     st.image(img_sam, use_container_width=True)
     st.caption("**Samuel** - El gestor de la integridad de los datos y los querys")
 
 with col_yon:
-    img_yon = cache_imagenes("assets\teamcard_4.png")
+    img_yon = cache_imagenes("assets/teamcard_4.png")
     st.image(img_yon, use_container_width=True)
     st.caption("**Yonelvis** - El Motor lógico de las métricas estadísticas y los querys")
 st.markdown("---")
