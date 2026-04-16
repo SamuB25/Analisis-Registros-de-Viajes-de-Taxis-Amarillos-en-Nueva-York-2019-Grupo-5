@@ -21,8 +21,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("Planteamiento del Problema y Marco Metodológico")
-st.markdown("---")
+st.image("assets/taxis_banner.png", use_column_width=True)
 
 st.header("1.1. Planteamiento del Problema")
 with st.container():
