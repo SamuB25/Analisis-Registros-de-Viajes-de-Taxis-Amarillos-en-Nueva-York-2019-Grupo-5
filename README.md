@@ -38,6 +38,24 @@ Analizar el comportamiento de los pasajeros de los Yellow Taxis de Nueva York du
 - **En Power BI:** Visualización del comportamiento general del universo (Métricas macro).
 - **A través de Streamlit:** Presentación de la investigación detallada y comparativa de perfiles (Investigación de nicho).
 
+##  Como usar? 🤔
+### 1. Clona el Repositorio:
+
+```bash
+https://github.com/SamuB25/Analisis-Registros-de-Viajes-de-Taxis-Amarillos-en-Nueva-York-2019-Grupo-5.git
+cd Analisis-Registros-de-Viajes-de-Taxis-Amarillos-en-Nueva-York-2019-Grupo-5
+```
+### 2. Instalar dependencias:
+```bash
+pip install -r requirements.txt
+```
+### 3. Correr la App:
+```bash
+streamlit run app.py
+```
+##  👑Visita nuestra App Streamlit
+https://3seczcpbtgr4mr4g5txcew.streamlit.app/
+
 ## 👥 Créditos
 **Equipo Grupo 5 - EECA UCV**
 - Victoria Díaz (@vicoandrediaz): Lógica de inserción/exportación por chunks y arquitectura del Data Lake. Desarrollo del de la app de Streamlit. 

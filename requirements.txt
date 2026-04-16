@@ -1,7 +1,6 @@
 streamlit
-gdown
-duckdb
 pandas
-numpy
-pyarrow
+duckdb
+gdown
 plotly
+Pillow

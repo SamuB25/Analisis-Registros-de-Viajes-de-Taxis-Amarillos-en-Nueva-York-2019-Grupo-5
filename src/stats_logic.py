@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 
-# 1. PALETA DE COLORES OFICIAL (Bickle Palette) 
+# 1. PALETA DE COLORES OFICIAL (Bickle Palette) inspirada en Taxi Driver 
 BICKLE_PALETTE = {
     "taxi_yellow": "#F2BC1B",
     "asphalt_night": "#121212",
@@ -87,14 +87,26 @@ def get_usage_frequencies(_qm, tipo_horario, mes):
 
 @st.cache_data
 def get_location_ranking(_qm, tipo_horario, mes, top=True):
-    """Retorna el TOP 5 de destinos (Geografía de la Demanda)[cite: 7, 52, 53]."""
+    """Retorna el TOP 5 de destinos (Geografía de la Demanda)."""
     filtro = build_sql_filter(tipo_horario, mes)
     orden = "DESC" if top else "ASC"
+    
+    # CORRECCIÓN: Quitamos la tilde a 'localizacion'
     query = f"""
         SELECT l.zone as Zona, COUNT(*) as Frecuencia
         FROM viaje v
-        JOIN locaización l ON v.do_location_id = l.location_id
+        JOIN localizacion l ON v.do_location_id = l.location_id
         WHERE {filtro}
         GROUP BY 1 ORDER BY 2 {orden} LIMIT 5
     """
     return _qm.execute_query(query)
+
+@st.cache_data
+def get_dynamic_insight(kpis, tipo_horario):
+    """Genera la reseña automática para el chat_message de app.py."""
+    if kpis['total_viajes'] == 0: return "No hay datos disponibles para este periodo."
+    
+    if tipo_horario == "Hora Pico":
+        return f"🚨 **Perfil de Alta Demanda:** En este horario, la propina promedio es de {format_kpi(kpis['avg_tip'], True)}. El volumen de viajes se concentra en distancias cortas e intensas."
+    else:
+        return f"🌙 **Perfil Valle:** Se observa una distancia promedio de {format_kpi(kpis['avg_distance'])} mi. Los viajes son más largos, posiblemente hacia zonas residenciales."
