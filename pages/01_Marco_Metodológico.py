@@ -21,8 +21,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("Planteamiento del Problema y Marco Metodológico")
-st.markdown("---")
+st.image("assets/taxis_banner.png", use_column_width=True)
 
 st.header("1.1. Planteamiento del Problema")
 with st.container():
@@ -33,10 +32,6 @@ with st.container():
     Sin un análisis descriptivo profundo que segmente estos registros, la información permanece como un conjunto de datos aislados sin utilidad práctica para la toma de decisiones estratégicas o la optimización del servicio. Por tanto, se requiere una investigación que, mediante el uso de herramientas tecnológicas avanzadas como <b>Power BI y Streamlit<b>, permita caracterizar la estructura de comportamiento de este universo de estudio.</div>
     """, unsafe_allow_html=True)
     st.markdown("---")
-
-st.header("1.2. La Pregunta de Investigación")
-with st.container():
-    st.markdown("""¿Cómo varía el comportamiento de los pasajeros de los Yellow Taxis de Nueva York según el factor horario (Hora Pico vs. Hora No Pico) durante el trimestre octubre-diciembre del año 2019?""")
 
 # PREGUNTA DE INVESTIGACIÓN
 st.markdown("""
@@ -68,7 +63,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- APLICACIÓN EN LA APP ---
+# VISTA DE LA PREGUNTA EN LA APP
 st.markdown("""
     <div class="pregunta-container">
         <span class="pregunta-label">Interrogante de Investigación</span>
@@ -77,6 +72,173 @@ st.markdown("""
         </p>
     </div>
     """, unsafe_allow_html=True)
+
+st.markdown("""
+    <style>
+    .justificado { text-align: justify; }
+    .destaque { color: #F2BC1B; font-weight: bold; }
+    .depto-card {
+        background-color: #1E1E1E;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 5px solid #F2BC1B;
+        margin-bottom: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- SECCIÓN 2: MARCO METODOLÓGICO ---
+st.header("2. Marco Metodológico")
+
+# --- 2.1 NIVEL DE INVESTIGACIÓN ---
+with st.expander("🔍 2.1. Nivel de Investigación", expanded=True):
+    st.markdown("""
+    <div class="justificado">
+    De acuerdo con los objetivos planteados, la presente investigación se define como de <span class="destaque">nivel descriptivo</span>. 
+    Según <b>Arias (2012)</b>, la investigación descriptiva consiste en la caracterización de un hecho o fenómeno con el fin 
+    de establecer su estructura o comportamiento.
+    <br><br>
+    En este sentido, el estudio se limita a describir el comportamiento de los pasajeros de los Yellow Taxis en Nueva York 
+    durante el cuarto trimestre de 2019. Al regirse por los estándares de la <b>Escuela de Estadística y Ciencias Actuariales</b>, 
+    los resultados poseen un carácter estrictamente descriptivo, absteniéndose de realizar inferencias más allá del 
+    universo de datos procesado.
+    </div>
+    """, unsafe_allow_html=True)
+
+# JUSTIFICACIÓN TEORICA
+st.header("2.2. Justificación de la Investigación")
+
+st.markdown("""
+<div class="justificado">
+La relevancia de esta investigación reside en la necesidad crítica de transformar datos masivos en 
+<b>conocimiento estratégico</b>. La normalización en <b>SQLite</b> y la implementación de un sistema 
+<span class="destaque">OLAP (On-Line Analytical Processing)</span> resultan fundamentales para este modelo de negocio.
+<br><br>
+Mientras que las consultas analíticas tradicionales demandan un tiempo computacional excesivo, los sistemas OLAP 
+permiten integrar y pre-calcular los datos (Data Lake en Parquet), garantizando la velocidad y precisión que el entorno actual exige.
+</div>
+""", unsafe_allow_html=True)
+
+st.write("") # Espacio
+
+# JUSTIFICACION POR DEPARTAMENTO
+st.subheader("Impacto Institucional y Organizativo")
+
+# Usamos columnas para los departamentos para que no sea una lista infinita
+col_mkt, col_cont = st.columns(2)
+
+with col_mkt:
+    st.markdown("""
+    <div class="depto-card">
+    <b>🎯 Marketing</b><br>
+    Segmentación y perfiles de clientes en Streamlit para identificar nichos según el factor horario y optimizar campañas.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="depto-card">
+    <b>📈 Logística</b><br>
+    Visualización en Power BI para detectar picos de demanda y asignar eficientemente los recursos en la ciudad.
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_cont:
+    st.markdown("""
+    <div class="depto-card">
+    <b>💰 Contabilidad</b><br>
+    Visión clara de flujos de ingresos y métricas de consumo para proyecciones financieras ajustadas a la realidad.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="depto-card">
+    <b>🚀 Tecnología</b><br>
+    Reducción de carga computacional mediante el uso de Parquet, mejorando la agilidad en la toma de decisiones.
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
+# ==============================================================================
+# --- 3. CUMPLIMIENTO ACADÉMICO Y OBJETIVOS ---
+# ==============================================================================
+
+# Nota de cumplimiento con estilo sutil
+st.info("""
+    En cumplimiento con los estándares académicos de la **Escuela de Estadística y Ciencias Actuariales (EECA)**, 
+    el presente proyecto se rige por un diseño de investigación descriptivo. Los resultados obtenidos, por ende, 
+    son de carácter descriptivo y no inferencial.
+""")
+
+st.write("")
+
+# Título de la sección
+st.header("Definición de Objetivos")
+
+# --- BLOQUE: OBJETIVO GENERAL ---
+# Usamos un contenedor con el color institucional del proyecto
+st.markdown("""
+    <div style="background-color: #1E1E1E; border-top: 4px solid #F2BC1B; border-bottom: 4px solid #F2BC1B; padding: 25px; border-radius: 5px; margin-bottom: 25px;">
+        <p style="color: #F2BC1B; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 14px; letter-spacing: 1px;">Objetivo General</p>
+        <p style="color: white; font-size: 19px; font-style: italic; line-height: 1.5; margin: 0;">
+            Analizar el comportamiento de los pasajeros de los Yellow Taxis de Nueva York durante el trimestre octubre-diciembre de 2019, 
+            específicamente en los intervalos de mayor afluencia de usuarios, para comprender la influencia de la variable <b>"hora"</b> 
+            en el resto de los indicadores con la finalidad de construir perfiles comparativos entre pasajeros de <b>"Hora Pico"</b> y <b>"Hora No Pico"</b>.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- LISTA: OBJETIVOS ESPECÍFICOS ---
+st.subheader("Objetivos Específicos")
+
+objetivos_especificos = [
+    "Normalizar la base de datos relacional (SQLite) para garantizar la integridad referencial y la consistencia de la información.",
+    "Transformar los registros crudos en un Data Lake limpio (Parquet) para optimizar la carga computacional durante el análisis descriptivo.",
+    "Analizar la dimensión 'Comportamiento del Pasajero' mediante el cálculo de estadísticos descriptivos y los indicadores señalados en la operacionalización de variables.",
+    "Identificar patrones generales de movilidad y consumo en el universo de estudio mediante visualizaciones en Power BI.",
+    "Segmentar y construir perfiles de clientes diferenciados en Streamlit, desglosando los hallazgos de la investigación estadística según el factor horario."
+]
+
+for obj in objetivos_especificos:
+    st.markdown(f"- {obj}")
+
+st.write("")
+st.markdown("---")
+
+# ==============================================================================
+# --- 4. UNIVERSO Y TÉCNICAS ---
+# ==============================================================================
+
+st.header("📋 Definición del Universo y Técnicas")
+
+# Usamos columnas para que la información sea fácil de leer de un vistazo
+col_univ, col_uni_an, col_tec = st.columns(3)
+
+with col_univ:
+    st.markdown("""
+        <div style="background-color: #121212; padding: 20px; border-radius: 10px; border: 1px solid #333; height: 100%;">
+            <h4 style="color: #F2BC1B; margin-top: 0;">Universo</h4>
+            <p style="font-size: 14px;">Registros de viajes realizados por los Yellow Taxis en la ciudad de Nueva York (NYC) durante el cuarto trimestre (octubre - diciembre) del año 2019.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col_uni_an:
+    st.markdown("""
+        <div style="background-color: #121212; padding: 20px; border-radius: 10px; border: 1px solid #333; height: 100%;">
+            <h4 style="color: #F2BC1B; margin-top: 0;">Unidad de Análisis</h4>
+            <p style="font-size: 14px;">Cada registro individual de viaje (<b>trip_id</b>) registrado en la ciudad de Nueva York (NYC) durante el cuarto trimestre de 2019.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col_tec:
+    st.markdown("""
+        <div style="background-color: #121212; padding: 20px; border-radius: 10px; border: 1px solid #333; height: 100%;">
+            <h4 style="color: #F2BC1B; margin-top: 0;">Técnicas</h4>
+            <p style="font-size: 14px;">Cálculo de estadísticos descriptivos: Medidas de Tendencia Central, Frecuencias Absolutas/Relativas y Medidas de Dispersión.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.write("")
+st.markdown("---")
 
 #PRESENTACIÓN DEL EQUIPO DE DESARROLLO
 st.header("Conoce a nuestro equipo de investigación y desarrollo (grupo 5)")

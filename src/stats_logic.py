@@ -45,14 +45,15 @@ def build_sql_filter(tipo_horario="Vista General", mes="Todos"):
 
 @st.cache_data
 def get_average_metrics(_qm, tipo_horario, mes):
-    """Calcula promedios para las Cards superiores[cite: 10, 38]."""
+    """Calcula promedios para las Cards superiores."""
     filtro = build_sql_filter(tipo_horario, mes)
     query = f"""
         SELECT 
             COUNT(v.trip_id) as total_viajes,
             AVG(v.trip_distance) as avg_distance,
             AVG(f.fare_amount) as avg_fare,
-            AVG(f.tip_amount) as avg_tip
+            AVG(f.tip_amount) as avg_tip,
+            AVG(f.total_amount) as avg_total
         FROM viaje v
         JOIN finanzas f ON v.trip_id = f.trip_id
         WHERE {filtro} AND f.total_amount > 0
@@ -86,20 +87,31 @@ def get_usage_frequencies(_qm, tipo_horario, mes):
     return _qm.execute_query(query)
 
 @st.cache_data
-def get_location_ranking(_qm, tipo_horario, mes, top=True):
-    """Retorna el TOP 5 de destinos (Geografía de la Demanda)."""
+def get_location_analysis(_qm, tipo_horario, mes, top=True, n=5):
     filtro = build_sql_filter(tipo_horario, mes)
     orden = "DESC" if top else "ASC"
     
-    # CORRECCIÓN: Quitamos la tilde a 'localizacion'
+    # Query para el total (necesario para la frecuencia relativa)
+    res_total = _qm.execute_query(f"SELECT COUNT(*) FROM viaje v WHERE {filtro}")
+    total_viajes = res_total.iloc[0, 0] if not res_total.empty else 0
+
+    if total_viajes == 0: return pd.DataFrame()
+
     query = f"""
         SELECT l.zone as Zona, COUNT(*) as Frecuencia
         FROM viaje v
         JOIN localizacion l ON v.do_location_id = l.location_id
         WHERE {filtro}
-        GROUP BY 1 ORDER BY 2 {orden} LIMIT 5
+        GROUP BY 1 ORDER BY 2 {orden} LIMIT {n}
     """
-    return _qm.execute_query(query)
+    df = _qm.execute_query(query)
+    
+    if not df.empty:
+        # Usamos nombres de columna simples para evitar errores de encoding
+        df.columns = ["Zona", "f_absoluta"] 
+        df["f_relativa"] = (df["f_absoluta"] / total_viajes * 100).round(2)
+    
+    return df
 
 @st.cache_data
 def get_dynamic_insight(kpis, tipo_horario):
@@ -110,3 +122,4 @@ def get_dynamic_insight(kpis, tipo_horario):
         return f"🚨 **Perfil de Alta Demanda:** En este horario, la propina promedio es de {format_kpi(kpis['avg_tip'], True)}. El volumen de viajes se concentra en distancias cortas e intensas."
     else:
         return f"🌙 **Perfil Valle:** Se observa una distancia promedio de {format_kpi(kpis['avg_distance'])} mi. Los viajes son más largos, posiblemente hacia zonas residenciales."
+    
