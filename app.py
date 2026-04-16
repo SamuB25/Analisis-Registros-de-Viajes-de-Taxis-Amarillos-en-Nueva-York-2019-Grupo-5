@@ -11,7 +11,8 @@ from src.stats_logic import (
     get_location_analysis,    # La tabla del Top 5 destinos
     get_dynamic_insight,     # La reseña del asistente
     get_passenger_distribution, # El gráfico de barras de pasajeros
-    get_usage_frequencies       # El gráfico de métodos de pago
+    get_usage_frequencies,
+    get_global_destination_stats       # El gráfico de métodos de pago
 )
 
 st.set_page_config(
@@ -138,3 +139,51 @@ if not df_destinos.empty:
             use_container_width=True,
             hide_index=True
         )
+
+st.header("Análisis Global de Destinos")
+st.write("Visualización de la totalidad de zonas de Nueva York según volumen de viajes y rentabilidad.")
+
+# Obtener la totalidad de los datos
+df_global = get_global_destination_stats(qm, tipo_horario, mes_filtro)
+
+if not df_global.empty:
+    # 1. Definimos el rango de color para evitar escalas negativas
+    min_tarifa = df_global["Tarifa_Promedio"].min()
+    max_tarifa = df_global["Tarifa_Promedio"].max()
+
+    # 2. Creamos el Treemap (Mapa de Calor de Proporciones)
+    fig_global = px.treemap(
+        df_global,
+        path=[px.Constant("Nueva York"), "Distrito", "Zona"], # Jerarquía visual
+        values="Frecuencia",
+        color="Tarifa_Promedio",
+        color_continuous_scale="YlOrRd", # Escala de amarillo a rojo (Taxi Style)
+        range_color=[min_tarifa, max_tarifa], # BLOQUEO DE NEGATIVOS
+        title="Intensidad de Demanda por Zona y Distrito",
+        hover_data={
+            "Frecuencia": True,
+            "Porcentaje (%)": ":.4f",
+            "Tarifa_Promedio": ":$.2f",
+            "Distrito": True
+        },
+        labels={"Tarifa_Promedio": "Tarifa Prom ($)"}
+    )
+
+    # 3. Ajustes de diseño para el "hover" (cuando pasas el mouse)
+    fig_global.update_traces(
+        textinfo="label+value",
+        hovertemplate="<b>%{label}</b><br>Viajes: %{value}<br>Tarifa Prom: %{customdata[2]}<br>Peso: %{customdata[1]}%"
+    )
+    
+    fig_global.update_layout(margin=dict(t=50, l=10, r=10, b=10))
+    
+    st.plotly_chart(fig_global, use_container_width=True)
+    
+    # 4. Resumen estadístico opcional
+    with st.expander("Ver tabla completa de frecuencias"):
+        st.dataframe(
+            df_global.style.format({"Tarifa_Promedio": "${:.2f}", "Porcentaje (%)": "{:.4f}%"}),
+            use_container_width=True
+        )
+else:
+    st.warning("No hay datos suficientes para generar el mapa de calor.")

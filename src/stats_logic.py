@@ -121,3 +121,34 @@ def get_dynamic_insight(kpis, tipo_horario):
         return f"🚨 **Perfil de Alta Demanda:** En este horario, la propina promedio es de {format_kpi(kpis['avg_tip'], True)}. El volumen de viajes se concentra en distancias cortas e intensas."
     else:
         return f"🌙 **Perfil Valle:** Se observa una distancia promedio de {format_kpi(kpis['avg_distance'])} mi. Los viajes son más largos, posiblemente hacia zonas residenciales."
+    
+@st.cache_data
+def get_global_destination_stats(_qm, tipo_horario, mes_filtro):
+    """
+    Obtiene la totalidad de destinos con su frecuencia y tarifa promedio.
+    """
+    filtro = build_sql_filter(tipo_horario, mes_filtro)
+    
+    # Query que une los hechos (viajes/finanzas) con la dimensión (localización)
+    query = f"""
+        SELECT 
+            l.borough AS Distrito,
+            l.zone AS Zona,
+            COUNT(v.trip_id) AS Frecuencia,
+            AVG(f.total_amount) AS Tarifa_Promedio
+        FROM registro_viajes v
+        JOIN localizacion_viaje l ON v.do_location_id = l.location_id
+        JOIN finanzas_viaje f ON v.trip_id = f.trip_id
+        WHERE {filtro}
+        GROUP BY 1, 2
+        ORDER BY 3 DESC
+    """
+    df = _qm.execute_query(query)
+    
+    if not df.empty:
+        # Calculamos el total global para porcentajes exactos
+        total_viajes = df["Frecuencia"].sum()
+        df["Porcentaje (%)"] = (df["Frecuencia"] / total_viajes * 100).round(4)
+        df["Tarifa_Promedio"] = df["Tarifa_Promedio"].round(2)
+        
+    return df
