@@ -87,35 +87,28 @@ def get_usage_frequencies(_qm, tipo_horario, mes):
 
 @st.cache_data
 def get_location_analysis(_qm, tipo_horario, mes, top=True, n=5):
-    """
-    Retorna el análisis de destinos con frecuencias absolutas y relativas.
-    top=True -> Más frecuentados | top=False -> Menos frecuentados
-    """
     filtro = build_sql_filter(tipo_horario, mes)
     orden = "DESC" if top else "ASC"
     
-    # Primero obtenemos el total para calcular la frecuencia relativa
-    total_query = f"SELECT COUNT(*) FROM viaje v WHERE {filtro}"
-    total_viajes = _qm.execute_query(total_query).iloc[0, 0]
-    
-    if total_viajes == 0:
-        return pd.DataFrame()
+    # Query para el total (necesario para la frecuencia relativa)
+    res_total = _qm.execute_query(f"SELECT COUNT(*) FROM viaje v WHERE {filtro}")
+    total_viajes = res_total.iloc[0, 0] if not res_total.empty else 0
+
+    if total_viajes == 0: return pd.DataFrame()
 
     query = f"""
-        SELECT 
-            l.zone as "Zona", 
-            COUNT(*) as "Frecuencia Absoluta (fᵢ)"
+        SELECT l.zone as Zona, COUNT(*) as Frecuencia
         FROM viaje v
         JOIN localizacion l ON v.do_location_id = l.location_id
         WHERE {filtro}
-        GROUP BY 1 
-        ORDER BY 2 {orden} 
-        LIMIT {n}
+        GROUP BY 1 ORDER BY 2 {orden} LIMIT {n}
     """
     df = _qm.execute_query(query)
     
-    # Calculamos la Frecuencia Relativa (%)
-    df["Frecuencia Relativa (%)"] = (df["Frecuencia Absoluta (fᵢ)"] / total_viajes * 100).round(2)
+    if not df.empty:
+        # Usamos nombres de columna simples para evitar errores de encoding
+        df.columns = ["Zona", "f_absoluta"] 
+        df["f_relativa"] = (df["f_absoluta"] / total_viajes * 100).round(2)
     
     return df
 

@@ -78,15 +78,18 @@ with col_der:
     st.bar_chart(df_pagos.set_index("Categoria"), color=accent)
     st.caption("*Nota: Los viajes con tarifa de $0 fueron removidos por limpieza de datos.*")
 
-# --- UI en tu archivo de página ---
+
 st.subheader("📍 Geografía de la Demanda: Análisis de Destinos")
 
 col_controles, _ = st.columns([1, 2])
 with col_controles:
-    # Switch para invertir la lógica
-    ver_top = st.toggle("Ver destinos más frecuentados", value=True, help="Activa para ver el TOP, desactiva para ver los destinos con menor demanda.")
+    ver_top = st.toggle(
+        "Ver destinos más frecuentados", 
+        value=True, 
+        help="Activa para ver el TOP, desactiva para ver las zonas con menor demanda."
+    )
 
-# Llamada a la función
+# Llamamos a la función 
 tipo_ranking = "Más Frecuentados" if ver_top else "Menos Frecuentados"
 df_destinos = get_location_analysis(qm, tipo_horario, mes, top=ver_top)
 
@@ -94,29 +97,48 @@ if not df_destinos.empty:
     tab1, tab2 = st.tabs(["📊 Distribución de Frecuencias", "📑 Tabla de Datos"])
     
     with tab1:
-        # Gráfico de barras horizontal para mejor lectura de nombres de zonas
         fig = px.bar(
             df_destinos,
-            x="Frecuencia Absoluta (fᵢ)",
+            x="f_absoluta",
             y="Zona",
             orientation='h',
-            title=f"Distribución de Destinos {tipo_ranking}",
-            labels={"Frecuencia Absoluta (fᵢ)": "Número de Viajes", "Zona": "Destino"},
-            color="Frecuencia Relativa (%)",
+            title=f"Distribución de Destinos: {tipo_ranking}",
+            labels={
+                "f_absoluta": "Frecuencia Absoluta (fi)", 
+                "Zona": "Zona de Destino",
+                "f_relativa": "Frecuencia Relativa (%)"
+            },
+            color="f_relativa",
+            # Verde/Azul para el Top, Rojo para el Bottom
             color_continuous_scale="Viridis" if ver_top else "Reds",
-            text="Frecuencia Relativa (%)"
+            text="f_relativa"
         )
+        
+        # Configuramos la etiqueta de porcentaje sobre las barras
         fig.update_traces(texttemplate='%{text}%', textposition='outside')
-        fig.update_layout(yaxis={'categoryorder':'total ascending'} if ver_top else {'categoryorder':'total descending'})
+        
+        # Ajustamos el orden para que el ranking sea legible
+        fig.update_layout(
+            yaxis={'categoryorder': 'total ascending' if ver_top else 'total descending'},
+            margin=dict(l=20, r=20, t=40, b=20)
+        )
         st.plotly_chart(fig, use_container_width=True)
 
     with tab2:
-        st.write(f"### Cuadro de Distribución: {tipo_ranking}")
+        st.write(f"### Cuadro de Distribución ($f_i$ y $h_i$): {tipo_ranking}")
+        
+        # Renombramos temporalmente solo para que la tabla se vea académica
+        df_vista = df_destinos.rename(columns={
+            "f_absoluta": "Frecuencia Absoluta (fi)",
+            "f_relativa": "Frecuencia Relativa (%)"
+        })
+        
         st.dataframe(
-            df_destinos.style.format({"Frecuencia Relativa (%)": "{:.2f}%"}),
+            df_vista.style.format({"Frecuencia Relativa (%)": "{:.2f}%"}),
             use_container_width=True,
             hide_index=True
         )
-        st.caption(f"Nota: Los porcentajes se calculan en base al universo total de viajes para el filtro seleccionado.")
+        st.caption(f"Nota: Los porcentajes se calculan en relación al universo total de viajes del periodo seleccionado.")
+
 else:
-    st.warning("No hay datos disponibles para los filtros seleccionados.")
+    st.warning(f"No se encontraron registros para generar el ranking de destinos {tipo_ranking.lower()}.")
