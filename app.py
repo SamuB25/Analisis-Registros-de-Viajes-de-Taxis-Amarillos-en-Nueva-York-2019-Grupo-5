@@ -91,7 +91,7 @@ with col_controles:
 
 # Llamamos a la función 
 tipo_ranking = "Más Frecuentados" if ver_top else "Menos Frecuentados"
-df_destinos = get_location_analysis(qm, tipo_horario, mes, top=ver_top)
+df_destinos = get_location_analysis(qm, tipo_horario, mes_filtro, top=ver_top)
 
 if not df_destinos.empty:
     tab1, tab2 = st.tabs(["📊 Distribución de Frecuencias", "📑 Tabla de Datos"])
