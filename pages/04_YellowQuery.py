@@ -222,13 +222,13 @@ if st.button("🚀 Ejecutar Yellow Query"):
 st.subheader("DICCIONARIO DEL YELLOW QUERY")
 
 st.markdown("#### Entidad: viaje")
-st.image("assets\diccionario_viaje.png", use_container_width=True)
+st.image("assets/diccionario_viaje.png", use_container_width=True)
     
 st.markdown("#### Entidad: finanzas")
-st.image("assets\diccionario_finanzas.png", use_container_width=True)
+st.image("assets/diccionario_finanzas.png", use_container_width=True)
     
 st.markdown("#### Entidades: localizacion y pagos")
-st.image("assets\diccionario_cat1.png", use_container_width=True)
+st.image("assets/diccionario_cat1.png", use_container_width=True)
     
 st.markdown("#### Entidades: tarifas y plataformas")
-st.image("assets\diccionario_cat2.png", use_container_width=True)
+st.image("assets/diccionario_cat2.png", use_container_width=True)
