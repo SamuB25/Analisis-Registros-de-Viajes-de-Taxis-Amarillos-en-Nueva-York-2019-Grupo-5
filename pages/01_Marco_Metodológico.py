@@ -158,6 +158,87 @@ with col_cont:
     """, unsafe_allow_html=True)
 
 st.markdown("---")
+# ==============================================================================
+# --- 3. CUMPLIMIENTO ACADÉMICO Y OBJETIVOS ---
+# ==============================================================================
+
+# Nota de cumplimiento con estilo sutil
+st.info("""
+    En cumplimiento con los estándares académicos de la **Escuela de Estadística y Ciencias Actuariales (EECA)**, 
+    el presente proyecto se rige por un diseño de investigación descriptivo. Los resultados obtenidos, por ende, 
+    son de carácter descriptivo y no inferencial.
+""")
+
+st.write("")
+
+# Título de la sección
+st.header("Definición de Objetivos")
+
+# --- BLOQUE: OBJETIVO GENERAL ---
+# Usamos un contenedor con el color institucional del proyecto
+st.markdown("""
+    <div style="background-color: #1E1E1E; border-top: 4px solid #F2BC1B; border-bottom: 4px solid #F2BC1B; padding: 25px; border-radius: 5px; margin-bottom: 25px;">
+        <p style="color: #F2BC1B; font-weight: bold; margin-bottom: 8px; text-transform: uppercase; font-size: 14px; letter-spacing: 1px;">Objetivo General</p>
+        <p style="color: white; font-size: 19px; font-style: italic; line-height: 1.5; margin: 0;">
+            Analizar el comportamiento de los pasajeros de los Yellow Taxis de Nueva York durante el trimestre octubre-diciembre de 2019, 
+            específicamente en los intervalos de mayor afluencia de usuarios, para comprender la influencia de la variable <b>"hora"</b> 
+            en el resto de los indicadores con la finalidad de construir perfiles comparativos entre pasajeros de <b>"Hora Pico"</b> y <b>"Hora No Pico"</b>.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- LISTA: OBJETIVOS ESPECÍFICOS ---
+st.subheader("Objetivos Específicos")
+
+objetivos_especificos = [
+    "Normalizar la base de datos relacional (SQLite) para garantizar la integridad referencial y la consistencia de la información.",
+    "Transformar los registros crudos en un Data Lake limpio (Parquet) para optimizar la carga computacional durante el análisis descriptivo.",
+    "Analizar la dimensión 'Comportamiento del Pasajero' mediante el cálculo de estadísticos descriptivos y los indicadores señalados en la operacionalización de variables.",
+    "Identificar patrones generales de movilidad y consumo en el universo de estudio mediante visualizaciones en Power BI.",
+    "Segmentar y construir perfiles de clientes diferenciados en Streamlit, desglosando los hallazgos de la investigación estadística según el factor horario."
+]
+
+for obj in objetivos_especificos:
+    st.markdown(f"- {obj}")
+
+st.write("")
+st.markdown("---")
+
+# ==============================================================================
+# --- 4. UNIVERSO Y TÉCNICAS ---
+# ==============================================================================
+
+st.header("📋 Definición del Universo y Técnicas")
+
+# Usamos columnas para que la información sea fácil de leer de un vistazo
+col_univ, col_uni_an, col_tec = st.columns(3)
+
+with col_univ:
+    st.markdown("""
+        <div style="background-color: #121212; padding: 20px; border-radius: 10px; border: 1px solid #333; height: 100%;">
+            <h4 style="color: #F2BC1B; margin-top: 0;">Universo</h4>
+            <p style="font-size: 14px;">Registros de viajes realizados por los Yellow Taxis en la ciudad de Nueva York (NYC) durante el cuarto trimestre (octubre - diciembre) del año 2019.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col_uni_an:
+    st.markdown("""
+        <div style="background-color: #121212; padding: 20px; border-radius: 10px; border: 1px solid #333; height: 100%;">
+            <h4 style="color: #F2BC1B; margin-top: 0;">Unidad de Análisis</h4>
+            <p style="font-size: 14px;">Cada registro individual de viaje (<b>trip_id</b>) registrado en la ciudad de Nueva York (NYC) durante el cuarto trimestre de 2019.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+with col_tec:
+    st.markdown("""
+        <div style="background-color: #121212; padding: 20px; border-radius: 10px; border: 1px solid #333; height: 100%;">
+            <h4 style="color: #F2BC1B; margin-top: 0;">Técnicas</h4>
+            <p style="font-size: 14px;">Cálculo de estadísticos descriptivos: Medidas de Tendencia Central, Frecuencias Absolutas/Relativas y Medidas de Dispersión.</p>
+        </div>
+    """, unsafe_allow_html=True)
+
+st.write("")
+st.markdown("---")
 
 #PRESENTACIÓN DEL EQUIPO DE DESARROLLO
 st.header("Conoce a nuestro equipo de investigación y desarrollo (grupo 5)")
