@@ -38,6 +38,10 @@ Analizar el comportamiento de los pasajeros de los Yellow Taxis de Nueva York du
 - **En Power BI:** Visualización del comportamiento general del universo (Métricas macro).
 - **A través de Streamlit:** Presentación de la investigación detallada y comparativa de perfiles (Investigación de nicho).
 
+## BASE DE DATOS: NYC TAXI TRIPS 2019 💽
+La Base de Datos está disponible en Kaggle que contiene información de millones de viajes en taxi durante el año 2019.
+URL: https://www.kaggle.com/datasets/dhruvildave/new-york-city-taxi-trips-2019
+
 ##  Como usar? 🤔
 ### 1. Clona el Repositorio:
 
