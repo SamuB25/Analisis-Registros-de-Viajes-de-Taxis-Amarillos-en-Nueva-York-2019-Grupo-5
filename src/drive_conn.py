@@ -9,30 +9,27 @@ FOLDER_ID = "1HxA98TMS4uUT_CCZQk1J_uKOZQT1ygHl"
 @st.cache_resource
 def preparar_data_lake():
     """
-    Descarga la carpeta completa de Drive y asegura la estructura de datos.
+    Descarga la carpeta de Drive de forma silenciosa y asegura la estructura.
     """
-    # Localizamos la raíz del proyecto para conectar
-    # Subimos un nivel desde 'src' para encontrar la raíz
+    # 1. Localizamos la raíz del proyecto
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_dir = os.path.join(base_dir, "data")
 
-    # Si la carpeta data no existe, la creamos
+    # 2. Creación silenciosa de la carpeta si no existe
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
 
-    # Verificamos si la carpeta está vacía (si hay parquets, no descargamos nada)
+    # 3. Verificamos si la carpeta está vacía
     if not os.listdir(data_dir):
-        st.warning("Iniciando descarga del Data Lake desde Google Drive...")
         url = f"https://drive.google.com/drive/folders/{FOLDER_ID}?usp=sharing"
         
         try:
-            # gdown.download_folder baja TODO lo que esté en ese link
-            gdown.download_folder(url, output=data_dir, quiet=False, use_cookies=False)
-            st.success("Datos descargados exitosamente.")
+            #quiet=True para que no haya rastro de la descarga
+            gdown.download_folder(url, output=data_dir, quiet=True, use_cookies=False)
             return True
-        except Exception as e:
-            st.error(f"Error crítico de conexión: {e}")
+        except Exception:
+            
             return False
     else:
-        # Si ya hay archivos, no hacemos perder tiempo al usuario
+        
         return True

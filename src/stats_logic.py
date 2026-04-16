@@ -126,14 +126,11 @@ def get_dynamic_insight(kpis, tipo_horario):
 #FUNCIONES PARA YELLOW QUERY
 
 def execute_custom_query(_qm, raw_query):
-    """
-    Ejecuta cualquier sentencia SQL enviada desde la UI.
-    Blindada con Try-Except para evitar que la app explote por errores de sintaxis.
-    """
     try:
-        #Damos uso esencial a nuestra librería principal, DUCK DB
         df = _qm.execute_query(raw_query)
+        # Si la ejecución devuelve algo que no es un DF (como un bool), lo convertimos en un DF vacío para evitar el crash
+        if not isinstance(df, pd.DataFrame):
+            return pd.DataFrame(), None
         return df, None
     except Exception as e:
-        # Si la query está mal escrita, devolvemos el error para mostrarlo en pantalla en la app
         return None, str(e)
