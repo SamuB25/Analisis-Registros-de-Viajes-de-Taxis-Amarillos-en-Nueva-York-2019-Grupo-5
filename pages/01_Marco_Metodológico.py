@@ -34,10 +34,6 @@ with st.container():
     """, unsafe_allow_html=True)
     st.markdown("---")
 
-st.header("1.2. La Pregunta de Investigación")
-with st.container():
-    st.markdown("""¿Cómo varía el comportamiento de los pasajeros de los Yellow Taxis de Nueva York según el factor horario (Hora Pico vs. Hora No Pico) durante el trimestre octubre-diciembre del año 2019?""")
-
 # PREGUNTA DE INVESTIGACIÓN
 st.markdown("""
     <style>
@@ -68,7 +64,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- APLICACIÓN EN LA APP ---
+# VISTA DE LA PREGUNTA EN LA APP
 st.markdown("""
     <div class="pregunta-container">
         <span class="pregunta-label">Interrogante de Investigación</span>
@@ -77,6 +73,92 @@ st.markdown("""
         </p>
     </div>
     """, unsafe_allow_html=True)
+
+st.markdown("""
+    <style>
+    .justificado { text-align: justify; }
+    .destaque { color: #F2BC1B; font-weight: bold; }
+    .depto-card {
+        background-color: #1E1E1E;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 5px solid #F2BC1B;
+        margin-bottom: 10px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+# --- SECCIÓN 2: MARCO METODOLÓGICO ---
+st.header("2. Marco Metodológico")
+
+# --- 2.1 NIVEL DE INVESTIGACIÓN ---
+with st.expander("🔍 2.1. Nivel de Investigación", expanded=True):
+    st.markdown("""
+    <div class="justificado">
+    De acuerdo con los objetivos planteados, la presente investigación se define como de <span class="destaque">nivel descriptivo</span>. 
+    Según <b>Arias (2012)</b>, la investigación descriptiva consiste en la caracterización de un hecho o fenómeno con el fin 
+    de establecer su estructura o comportamiento.
+    <br><br>
+    En este sentido, el estudio se limita a describir el comportamiento de los pasajeros de los Yellow Taxis en Nueva York 
+    durante el cuarto trimestre de 2019. Al regirse por los estándares de la <b>Escuela de Estadística y Ciencias Actuariales</b>, 
+    los resultados poseen un carácter estrictamente descriptivo, absteniéndose de realizar inferencias más allá del 
+    universo de datos procesado.
+    </div>
+    """, unsafe_allow_html=True)
+
+# JUSTIFICACIÓN TEORICA
+st.header("2.2. Justificación de la Investigación")
+
+st.markdown("""
+<div class="justificado">
+La relevancia de esta investigación reside en la necesidad crítica de transformar datos masivos en 
+<b>conocimiento estratégico</b>. La normalización en <b>SQLite</b> y la implementación de un sistema 
+<span class="destaque">OLAP (On-Line Analytical Processing)</span> resultan fundamentales para este modelo de negocio.
+<br><br>
+Mientras que las consultas analíticas tradicionales demandan un tiempo computacional excesivo, los sistemas OLAP 
+permiten integrar y pre-calcular los datos (Data Lake en Parquet), garantizando la velocidad y precisión que el entorno actual exige.
+</div>
+""", unsafe_allow_html=True)
+
+st.write("") # Espacio
+
+# JUSTIFICACION POR DEPARTAMENTO
+st.subheader("Impacto Institucional y Organizativo")
+
+# Usamos columnas para los departamentos para que no sea una lista infinita
+col_mkt, col_cont = st.columns(2)
+
+with col_mkt:
+    st.markdown("""
+    <div class="depto-card">
+    <b>🎯 Marketing</b><br>
+    Segmentación y perfiles de clientes en Streamlit para identificar nichos según el factor horario y optimizar campañas.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="depto-card">
+    <b>📈 Logística</b><br>
+    Visualización en Power BI para detectar picos de demanda y asignar eficientemente los recursos en la ciudad.
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_cont:
+    st.markdown("""
+    <div class="depto-card">
+    <b>💰 Contabilidad</b><br>
+    Visión clara de flujos de ingresos y métricas de consumo para proyecciones financieras ajustadas a la realidad.
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <div class="depto-card">
+    <b>🚀 Tecnología</b><br>
+    Reducción de carga computacional mediante el uso de Parquet, mejorando la agilidad en la toma de decisiones.
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
 
 #PRESENTACIÓN DEL EQUIPO DE DESARROLLO
 st.header("Conoce a nuestro equipo de investigación y desarrollo (grupo 5)")
